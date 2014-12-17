@@ -135,7 +135,7 @@ Display Manipulation
     --erase-chars[=N], --ech[=N]
     --repeat[=N], --rep[=N]  Repeat preceding character N times.
 
-Cursor Positioning:
+Cursor:
     --up[=N], --cuu[=N]
     --down[=N], --cud[=N]
     --forward[=N], --cuf[=N]
@@ -149,6 +149,13 @@ Cursor Positioning:
     --column-relative[=N], --hpr[=N]
     --line[=N], --vpa[=N]
     --line-relative[=N], --vpr[=N]
+    --save-cursor            Saves the cursor position.  Restores the cursor
+                             after writing text to the terminal unless
+                             --no-restore is also used.
+    --restore-cursor         Just restores the cursor.
+    --hide-cursor            Will automatically show cursor unless --no-restore
+                             is also used.
+    --show-cursor
 
 Colors:
     Attributes:
@@ -166,7 +173,10 @@ Colors:
         --bg-blue-intense, --bg-magenta-intense, --bg-cyan-intense,
         --bg-white-intense
     Reset:
-        --reset-attrib, --reset-foreground, --reset-background, --reset-all
+        --reset-attrib       Removes bold, italics, etc.
+        --reset-foreground   Sets foreground to default color.
+        --reset-background   Sets background to default color.
+        --reset-color        Resets attributes, foreground, background.
 
 Report:
     ** NOTE:  These require reading from stdin.  Results are sent to stdout.
@@ -184,10 +194,6 @@ Miscellaneous:
     --color-table            Display a color table.
     --icon=NAME              Set the terminal's icon name.
     --title=TITLE            Set the terminal's window title.
-    --save-cursor            Saves the cursor position.  Restores the cursor
-                             after writing text to the terminal unless
-                             --no-restore is also used.
-    --restore-cursor         Just restores the cursor.
     --no-restore             Do not issue reset codes when changing colors.
                              For example, if you change the color to green,
                              normally the color is restored to default
@@ -195,6 +201,8 @@ Miscellaneous:
                              stay green even when the command finishes.
     --newline                Add a newline at the end.
     --escape                 Allow text passed in to contain escape sequences.
+    --reset                  Reset colors, clear screen, show cursor, move
+                             cursor to 1,1.
 EOF
 }
 
@@ -307,6 +315,24 @@ while $CONTINUE; do
 
         --line-relative | --line-relative=* | --vpr | --vpr=*)
             add-code "$1" 'e'
+            ;;
+
+        --save-cursor)
+            OUTPUT="$OUTPUT${CSI}s"
+            SUFFIX="${CSI}u$SUFFIX"
+            ;;
+
+        --restore-cursor)
+            OUTPUT="$OUTPUT${CSI}u"
+            ;;
+
+        --hide-cursor)
+            OUTPUT="$OUTPUT${CSI}?25l"
+            SUFFIX="${CSI}?25h"
+            ;;
+
+        --show-cursor)
+            OUTPUT="$OUTPUT${CSI}?25h"
             ;;
 
         # Colors - Attributes
@@ -505,7 +531,7 @@ while $CONTINUE; do
             OUTPUT="$OUTPUT${CSI}39m"
             ;;
 
-        --reset-all)
+        --reset-color)
             OUTPUT="$OUTPUT${CSI}0m"
             ;;
 
@@ -575,15 +601,6 @@ while $CONTINUE; do
             OUTPUT="$OUTPUT${OSC}2;${1#*=}$ST"
             ;;
 
-        --save-cursor)
-            OUTPUT="$OUTPUT${CSI}s"
-            SUFFIX="${CSI}u$SUFFIX"
-            ;;
-
-        --restore-cursor)
-            OUTPUT="$OUTPUT${CSI}u"
-            ;;
-
         --no-restore)
             RESTORE=false
             ;;
@@ -594,6 +611,14 @@ while $CONTINUE; do
 
         --escape)
             ESCAPE=true
+            ;;
+
+        --reset)
+            # 0m - reset all colors and attributes
+            # 2J - clear terminal
+            # 1;1H - move to 1,1
+            # ?25h - show cursor
+            OUTPUT="$OUTPUT${CSI}0m${CSI}2J${CSI}1;1H${CSI}?25h"
             ;;
 
         --)

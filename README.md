@@ -18,7 +18,7 @@ Usage
 -----
 
     ansi [OPTIONS] [TEXT TO DISPLAY]
-    
+
 The OPTIONS are numerous and are detailed below.  You can specify as many as you like.  Option processing stops at the first unknown option and at `--`.  Options are applied in the order specified on the command line.  When colors are changed, they are removed in reverse order as long as `--no-restore`  is not used.
 
 
@@ -29,13 +29,13 @@ Here's a few quick examples to get you started.
 
     # Write "Tests pass" in green on its own line
     ansi --green --newline "Tests pass"
-    
+
     # Change the terminal's title to the working directory
     ansi --title="$(pwd)"
-    
+
     # Reset the terminal and move the cursor to row 1 column 1
     ansi --erase-display=2 --reset-all --position=1,1 --no-restore
-    
+
     # Find out how many lines the terminal can display
     ansi --report-window-chars | cut -d , -f 1
 
@@ -59,8 +59,8 @@ The short version of these options comes from the command they are implementing.
 * `--repeat[=N]`, `--rep[=N]` - Repeat preceding character N times.
 
 
-Options - Cursor Positioning
-----------------------------
+Options - Cursor
+----------------
 
 The short version of these options comes from the command they are implementing.
 
@@ -77,8 +77,10 @@ The short version of these options comes from the command they are implementing.
 * `--column-relative[=N]`, `--hpr[=N]`
 * `--line[=N]`, `--vpa[=N]`
 * `--line-relative[=N]`, `--vpr[=N]`
-* `--save-cursor` - Saves the cursor position.  By default, this will restore the cursor after writing text to the terminal.
+* `--save-cursor` - Saves the cursor position.  By default, this will restore the cursor after writing text to the terminal unless you use `--no-restore`.
 * `--restore-cursor` - This just restores the cursor position.  Normally this executes at the end when you use `--save-cursor`.
+* `--hide-cursor` - This also will show the cursor at the end unless you use `--no-restore`.
+* `--show-cursor`
 
 
 Options - Colors (Attributes)
@@ -151,7 +153,7 @@ These options force a reset of colors.  This is useful if you used `--no-reset` 
 * `--reset-attrib` - Reset all attributes
 * `--reset-foreground` - Reset the foreground to default
 * `--reset-background` - Reset the background to default
-* `--reset-all` - Reset all color-related settings
+* `--reset-color` - Reset all color-related settings
 
 
 Reporting
@@ -180,6 +182,7 @@ Miscellaneous
 * `--no-restore` - Do not issue reset codes when changing colors and saving the cursor.  For example, if you use `--green` then the text will automatically be reset to the default color when the command terminates.  With `--no-restore` set, the text will stay green and subsequent commands that output will keep writing in green until something else changes the terminal.
 * `--newline` - Add a newline at the end.
 * `--escape` - Allow text passed in to contain escape sequences.
+* `--reset` - Reset all colors, clear the screen, show the cursor and move to 1,1.
 
 
 Demonstrations
