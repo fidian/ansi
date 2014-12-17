@@ -200,3 +200,9 @@ Demonstrations
 ### --color-table
 
 ![](images/color-table.png)
+
+
+License
+-------
+
+This project is licensed under a MIT style license with an additional non-advertising clause.  See [LICENSE.md](LICENSE.md) for more information.
