@@ -11,7 +11,7 @@ If it helps, you can think of it as a curses / ncurses library for bash, or a to
 Installation
 ------------
 
-Download `ansi` and put it somewhere in your path.  Make sure that bash is installed on your system.  No external commands are used; this only uses bash's built-in features.
+Download `ansi` and put it somewhere in your path.  Make sure that it is executable (`chmod a+x ansi` works well).  Bash will need to be present, but it is often installed by default.  No external commands are used; this only uses bash's built-in features.
 
 Not all features will work with all terminals.  Your terminal determines if particular codes work.
 
