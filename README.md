@@ -35,6 +35,9 @@ Here's a few quick examples to get you started.
     
     # Reset the terminal and move the cursor to row 1 column 1
     ansi --erase-display=2 --reset-all --position=1,1 --no-restore
+    
+    # Find out how many lines the terminal can display
+    ansi --report-window-chars | cut -d , -f 1
 
 Need more?  Check out the [examples/](examples/) folder.
 
