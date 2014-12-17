@@ -3,9 +3,9 @@ ANSI Code Generator
 
 ![](images/headline.png)
 
-This bash script will generate the proper ANSI escape sequences to move the cursor around the screen, make text bold, add colors and do much more.
+This bash script will generate the proper ANSI escape sequences to move the cursor around the screen, make text bold, add colors and do much more.  It is designed to help you colorize words and bits of text.
 
-If it helps, you can think of it as a curses / ncurses library for bash, or a tool that helps you using tricks from DOS's ANSI.SYS.
+If it helps, you can think of it as a curses / ncurses library for bash, or a tool that helps you using tricks from DOS's ANSI.SYS.  Or you might consider this to be your magic highlighter that has always been missing from bash.
 
 
 Installation
