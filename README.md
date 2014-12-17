@@ -33,8 +33,10 @@ Here's a few quick examples to get you started.
     # Change the terminal's title to the working directory
     ansi --title="$(pwd)"
 
-    # Reset the terminal and move the cursor to row 1 column 1
-    ansi --erase-display=2 --reset-all --position=1,1 --no-restore
+    # Reset the terminal colors and move the cursor to row 1 column 1
+    # and show the cursor if it was previously hidden.
+    # This is the same as the --reset option.
+    ansi --erase-display=2 --reset-all --position=1,1 --show-cursor
 
     # Find out how many lines the terminal can display
     ansi --report-window-chars | cut -d , -f 1
