@@ -184,7 +184,7 @@ Miscellaneous
 * `--icon=NAME` - Set the icon
 * `--title=TITLE` - Set the title of the terminal.  The equals (=) before the `TITLE` parameter is mandatory.  `TITLE` can be empty.
 * `--no-restore` - Do not issue reset codes when changing colors and saving the cursor.  For example, if you use `--green` then the text will automatically be reset to the default color when the command terminates.  With `--no-restore` set, the text will stay green and subsequent commands that output will keep writing in green until something else changes the terminal.
-* `--newline` - Add a newline at the end.
+* `-n`, `--newline` - Add a newline at the end.
 * `--escape` - Allow text passed in to contain escape sequences.
 * `--reset` - Reset all colors, clear the screen, show the cursor and move to 1,1.
 
