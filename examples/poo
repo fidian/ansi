@@ -1,0 +1,78 @@
+#!/bin/bash
+
+showLine() {
+    local I LEN REPLACED
+    LEN="${#1}"
+    REPLACED=""
+    ansi --column=$(($CENTER - (($LEN + 1) / 2)))
+    for ((I=0; I < ${#1}; I++)); do
+        case "${1:$I:1}" in
+            " ")
+                REPLACED+="$L#"
+                ;;
+
+            "X")
+                REPLACED+="$B "
+                ;;
+
+            "#")
+                REPLACED+="$W "
+                ;;
+
+            ":")
+                REPLACED+="$D#"
+                ;;
+
+            *)
+                REPLACED+="$R?"
+                ;;
+        esac
+    done
+    echo "$REPLACED$R"
+}
+
+# Black
+B=$(ansi --no-restore --bg-black)
+# White
+W=$(ansi --no-restore --bg-white)
+# Light
+L=$(ansi --bg-yellow --black --no-restore)
+# Dark
+D=$(ansi --bg-black --yellow --no-restore)
+# Reset
+R=$(ansi --reset-color)
+
+POO=(
+              "XXXXXXX"
+             "XX#####XXXX"
+             "XX#::::###XXX"
+             "XX#::::   ##XXX"
+            "XX#:::    :::##XX"
+          "XXX##      :::: ##XXX"
+         "XX##     :::::::: ###XX"
+        "XX#   ::::::::     :::#XX"
+       "XX#:::::::::      ::::: #XX"
+      "XX##   #####      #####: ##XXX"
+     "XX#    ##XXX##::::##XXX##   ##XX"
+    "XX#:  ::##XXX##::::##XXX##    #XX"
+   "XXX#::::::#####:::   #####    :#XXX"
+  "XX##:::                     :::::##XXX"
+ "XX#           ############:::::::   ##XX"
+"XX#              ########::::::       #XX"
+"XX#:::::              :::::::         #XX"
+ "XX##::::::::::::::::::::::::::::::###XXX"
+  "XXX##############################XXXX"
+    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+)
+
+
+CENTER=$(tput cols)
+CENTER=$((CENTER / 2))
+
+ansi --save-cursor --hide-cursor --position=2,1
+
+for LINE in "${POO[@]}"; do
+    showLine "$LINE"
+done
+
+ansi --show-cursor --restore-cursor
