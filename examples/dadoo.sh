@@ -1,6 +1,6 @@
 #!/bin/bash
 ######################################################################
-# Silly dice thingy...
+# Dice thingy...
 ######################################################################
 pip=o
 p0="       "
@@ -34,5 +34,5 @@ ansi --bg-white --black "${dice[RANDOM%6]}"
 ansi --position=2,20
 ansi --bg-black --white "${dice[RANDOM%6]}"
 
-echo -ne
+echo 
 exit 0
