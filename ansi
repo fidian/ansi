@@ -207,6 +207,7 @@ Miscellaneous:
                              stay green even when the command finishes.
     -n, --newline            Add a newline at the end.
     --escape                 Allow text passed in to contain escape sequences.
+    --bell                   Add the terminal's bell sequence to the output.
     --reset                  Reset colors, clear screen, show cursor, move
                              cursor to 1,1.
 EOF
@@ -223,6 +224,7 @@ OSC="${ESC}]"
 ST="${ESC}\\"
 OUTPUT=""
 SUFFIX=""
+BELL=false
 while $CONTINUE; do
     case "$1" in
         --help | -h | -\?)
@@ -619,6 +621,10 @@ while $CONTINUE; do
             ESCAPE=true
             ;;
 
+        --bell)
+            BELL=true
+            ;;
+
         --reset)
             # 0m - reset all colors and attributes
             # 2J - clear terminal
@@ -643,6 +649,10 @@ while $CONTINUE; do
 done
 
 echo -n "$OUTPUT"
+
+if $BELL; then
+    echo -e '\a'
+fi
 
 if $ESCAPE; then
     echo -en "${1+"$@"}"
