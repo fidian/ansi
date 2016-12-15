@@ -218,13 +218,14 @@ CONTINUE=true
 RESTORE=true
 NEWLINE=false
 ESCAPE=false
-ESC="$(echo -e '\033')"
+ESC=$'\033'
 CSI="${ESC}["
 OSC="${ESC}]"
 ST="${ESC}\\"
 OUTPUT=""
 SUFFIX=""
-BELL=false
+BELL=$'\007'
+
 while $CONTINUE; do
     case "$1" in
         --help | -h | -\?)
@@ -622,7 +623,7 @@ while $CONTINUE; do
             ;;
 
         --bell)
-            BELL=true
+            OUTPUT="$OUTPUT$BELL"
             ;;
 
         --reset)
@@ -649,10 +650,6 @@ while $CONTINUE; do
 done
 
 echo -n "$OUTPUT"
-
-if $BELL; then
-    echo -e '\a'
-fi
 
 if $ESCAPE; then
     echo -en "${1+"$@"}"
