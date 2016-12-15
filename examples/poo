@@ -4,7 +4,7 @@ showLine() {
     local I LEN REPLACED
     LEN="${#1}"
     REPLACED=""
-    ansi --column=$(($CENTER - (($LEN + 1) / 2)))
+    ansi --column=$((CENTER - ((LEN + 1) / 2)))
     for ((I=0; I < ${#1}; I++)); do
         case "${1:$I:1}" in
             " ")
