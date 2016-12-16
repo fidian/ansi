@@ -186,6 +186,7 @@ Miscellaneous
 * `--no-restore` - Do not issue reset codes when changing colors and saving the cursor.  For example, if you use `--green` then the text will automatically be reset to the default color when the command terminates.  With `--no-restore` set, the text will stay green and subsequent commands that output will keep writing in green until something else changes the terminal.
 * `-n`, `--newline` - Add a newline at the end.
 * `--escape` - Allow text passed in to contain escape sequences.
+* `--bell` - Add the terminal's bell sequence to the output.
 * `--reset` - Reset all colors, clear the screen, show the cursor and move to 1,1.
 
 
