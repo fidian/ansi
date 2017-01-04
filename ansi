@@ -213,454 +213,458 @@ Miscellaneous:
 EOF
 }
 
-# Handle long options until we hit an unrecognized thing
-CONTINUE=true
-RESTORE=true
-NEWLINE=false
-ESCAPE=false
-ESC=$'\033'
-CSI="${ESC}["
-OSC="${ESC}]"
-ST="${ESC}\\"
-OUTPUT=""
-SUFFIX=""
-BELL=$'\007'
-
-while $CONTINUE; do
-    case "$1" in
-        --help | -h | -\?)
-            show-help
-            ;;
-
-        # Display Manipulation
-        --insert-chars | --insert-chars=* | --ich | --ich=*)
-            add-code "$1" @
-            ;;
-
-        --erase-display | --erase-display=* | --ed | --ed=*)
-            add-code "$1" J
-            ;;
-
-        --erase-line | --erase-line=* | --el | --el=*)
-            add-code "$1" K
-            ;;
-
-        --insert-lines | --insert-lines=* | --il | --il=*)
-            add-code "$1" L
-            ;;
-
-        --delete-lines | --delete-lines=* | --dl | --dl=*)
-            add-code "$1" M
-            ;;
-
-        --delete-chars | --delete-chars=* | --dch | --dch=*)
-            add-code "$1" P
-            ;;
-
-        --scroll-up | --scroll-up=* | --su | --su=*)
-            add-code "$1" S
-            ;;
-
-        --scroll-down | --scroll-down=* | --sd | --sd=*)
-            add-code "$1" T
-            ;;
-
-        --erase-chars | --erase-chars=* | --ech | --ech=*)
-            add-code "$1" X
-            ;;
-
-        --repeat | --repeat=* | --rep | --rep=N)
-            add-code "$1" b
-            ;;
-
-        # Cursor Positioning
-        --up | --up=* | --cuu | --cuu=*)
-            add-code "$1" A
-            ;;
-
-        --down | --down=* | --cud | --cud=*)
-            add-code "$1" B
-            ;;
-
-        --forward | --forward=* | --cuf | --cuf=*)
-            add-code "$1" C
-            ;;
-
-        --backward | --backward=*| --cub | --cub=*)
-            add-code "$1" D
-            ;;
-
-        --next-line | --next-line=* | --cnl | --cnl=*)
-            add-code "$1" E
-            ;;
-
-        --prev-line | --prev-line=* | --cpl | --cpl=*)
-            add-code "$1" F
-            ;;
-
-        --column | --column=* | --cha | --cha=*)
-            add-code "$1" G
-            ;;
-
-        --position | --position=* | --cup | --cup=*)
-            add-code "$1" H
-            ;;
-
-        --tab-forward | --tab-forward=* | --cht | --cht=*)
-            add-code "$1" I
-            ;;
-
-        --tab-backward | --tab-backward=* | --cbt | --cbt=*)
-            add-code "$1" Z
-            ;;
-
-        --column-relative | --column-relative=* | --hpr | --hpr=*)
-            add-code "$1" 'a'
-            ;;
-
-        --line | --line=* | --vpa | --vpa=*)
-            add-code "$1" 'd'
-            ;;
-
-        --line-relative | --line-relative=* | --vpr | --vpr=*)
-            add-code "$1" 'e'
-            ;;
-
-        --save-cursor)
-            OUTPUT="$OUTPUT${CSI}s"
-            SUFFIX="${CSI}u$SUFFIX"
-            ;;
-
-        --restore-cursor)
-            OUTPUT="$OUTPUT${CSI}u"
-            ;;
-
-        --hide-cursor)
-            OUTPUT="$OUTPUT${CSI}?25l"
-            SUFFIX="${CSI}?25h"
-            ;;
-
-        --show-cursor)
-            OUTPUT="$OUTPUT${CSI}?25h"
-            ;;
-
-        # Colors - Attributes
-        --bold)
-            add-color 1 22
-            ;;
-
-        --faint)
-            add-color 2 22
-            ;;
-
-        --italic)
-            add-color 3 23
-            ;;
-
-        --underline)
-            add-color 4 24
-            ;;
-
-        --blink)
-            add-color 5 25
-            ;;
-
-        --inverse)
-            add-color 7 27
-            ;;
-
-        --invisible)
-            add-color 8 28
-            ;;
-
-        --strike)
-            add-color 9 20
-            ;;
-
-        --fraktur)
-            add-color 20 23
-            ;;
-
-        --double-underline)
-            add-color 21 24
-            ;;
-
-        --frame)
-            add-color 51 54
-            ;;
-
-        --encircle)
-            add-color 52 54
-            ;;
-
-        --overline)
-            add-color 53 55
-            ;;
-
-        # Colors - Foreground
-        --black)
-            add-color 30 39
-            ;;
-
-        --red)
-            add-color 31 39
-            ;;
-
-        --green)
-            add-color 32 39
-            ;;
-
-        --yellow)
-            add-color 33 39
-            ;;
-
-        --blue)
-            add-color 34 39
-            ;;
-
-        --magenta)
-            add-color 35 39
-            ;;
-
-        --cyan)
-            add-color 36 39
-            ;;
-
-        --white)
-            add-color 37 39
-            ;;
-
-        --black-intense)
-            add-color 90 39
-            ;;
-
-        --red-intense)
-            add-color 91 39
-            ;;
-
-        --green-intense)
-            add-color 92 39
-            ;;
-
-        --yellow-intense)
-            add-color 93 39
-            ;;
-
-        --blue-intense)
-            add-color 94 39
-            ;;
-
-        --magenta-intense)
-            add-color 95 39
-            ;;
-
-        --cyan-intense)
-            add-color 96 39
-            ;;
-
-        --white-intense)
-            add-color 97 39
-            ;;
-
-        # Colors - Background
-        --bg-black)
-            add-color 40 49
-            ;;
-
-        --bg-red)
-            add-color 41 49
-            ;;
-
-        --bg-green)
-            add-color 42 49
-            ;;
-
-        --bg-yellow)
-            add-color 43 49
-            ;;
-
-        --bg-blue)
-            add-color 44 49
-            ;;
-
-        --bg-magenta)
-            add-color 45 49
-            ;;
-
-        --bg-cyan)
-            add-color 46 49
-            ;;
-
-        --bg-white)
-            add-color 47 49
-            ;;
-
-        --bg-black-intense)
-            add-color 100 49
-            ;;
-
-        --bg-red-intense)
-            add-color 101 49
-            ;;
-
-        --bg-green-intense)
-            add-color 102 49
-            ;;
-
-        --bg-yellow-intense)
-            add-color 103 49
-            ;;
-
-        --bg-blue-intense)
-            add-color 104 49
-            ;;
-
-        --bg-magenta-intense)
-            add-color 105 49
-            ;;
-
-        --bg-cyan-intense)
-            add-color 106 49
-            ;;
-
-        --bg-white-intense)
-            add-color 107 49
-            ;;
-
-        # Colors - Reset
-        --reset-attrib)
-            OUTPUT="$OUTPUT${CSI}22;23;24;25;27;28;29;54;55m"
-            ;;
-
-        --reset-foreground)
-            OUTPUT="$OUTPUT${CSI}39m"
-            ;;
-
-        --reset-background)
-            OUTPUT="$OUTPUT${CSI}39m"
-            ;;
-
-        --reset-color)
-            OUTPUT="$OUTPUT${CSI}0m"
-            ;;
-
-        # Reporting
-        --report-position)
-            report 6n "$CSI" R || exit 1
-            echo "${REPORT//;/,}"
-            ;;
-
-        --report-window-state)
-            report 11t "$CSI" t || exit 1
-            case "$REPORT" in
-                1)
-                    echo "open"
-                    ;;
-
-                2)
-                    echo "iconified"
-                    ;;
-
-                *)
-                    echo "unknown ($REPORT)"
-                    ;;
-            esac
-            ;;
-
-        --report-window-position)
-            report 13t "${CSI}3;" t || exit 1
-            echo "${REPORT//;/,}"
-            ;;
-
-        --report-window-pixels)
-            report 14t "${CSI}4;" t || exit 1
-            echo "${REPORT//;/,}"
-            ;;
-
-        --report-window-chars)
-            report 18t "${CSI}8;" t || exit 1
-            echo "${REPORT//;/,}"
-            ;;
-
-        --report-screen-chars)
-            report 19t "${CSI}9;" t || exit 1
-            echo "${REPORT//;/,}"
-            ;;
-
-        --report-icon)
-            report 20t "${OSC}L" "$ST" || exit 1
-            echo "${REPORT}"
-            ;;
-
-        --report-title)
-            report 21t "${OSC}l" "$ST" || exit 1
-            echo "${REPORT}"
-            ;;
-
-        # Miscellaneous
-        --color-table)
-            color-table
-            ;;
-
-        --icon=*)
-            OUTPUT="$OUTPUT${OSC}1;${1#*=}$ST"
-            ;;
-
-        --title=*)
-            OUTPUT="$OUTPUT${OSC}2;${1#*=}$ST"
-            ;;
-
-        --no-restore)
-            RESTORE=false
-            ;;
-
-        -n | --newline)
-            NEWLINE=true
-            ;;
-
-        --escape)
-            ESCAPE=true
-            ;;
-
-        --bell)
-            OUTPUT="$OUTPUT$BELL"
-            ;;
-
-        --reset)
-            # 0m - reset all colors and attributes
-            # 2J - clear terminal
-            # 1;1H - move to 1,1
-            # ?25h - show cursor
-            OUTPUT="$OUTPUT${CSI}0m${CSI}2J${CSI}1;1H${CSI}?25h"
-            ;;
-
-        --)
-            CONTINUE=false
+main() {
+    # Handle long options until we hit an unrecognized thing
+    local CONTINUE=true
+    local RESTORE=true
+    local NEWLINE=false
+    local ESCAPE=false
+    local ESC=$'\033'
+    local CSI="${ESC}["
+    local OSC="${ESC}]"
+    local ST="${ESC}\\"
+    local OUTPUT=""
+    local SUFFIX=""
+    local BELL=$'\007'
+
+    while $CONTINUE; do
+        case "$1" in
+            --help | -h | -\?)
+                show-help
+                ;;
+
+            # Display Manipulation
+            --insert-chars | --insert-chars=* | --ich | --ich=*)
+                add-code "$1" @
+                ;;
+
+            --erase-display | --erase-display=* | --ed | --ed=*)
+                add-code "$1" J
+                ;;
+
+            --erase-line | --erase-line=* | --el | --el=*)
+                add-code "$1" K
+                ;;
+
+            --insert-lines | --insert-lines=* | --il | --il=*)
+                add-code "$1" L
+                ;;
+
+            --delete-lines | --delete-lines=* | --dl | --dl=*)
+                add-code "$1" M
+                ;;
+
+            --delete-chars | --delete-chars=* | --dch | --dch=*)
+                add-code "$1" P
+                ;;
+
+            --scroll-up | --scroll-up=* | --su | --su=*)
+                add-code "$1" S
+                ;;
+
+            --scroll-down | --scroll-down=* | --sd | --sd=*)
+                add-code "$1" T
+                ;;
+
+            --erase-chars | --erase-chars=* | --ech | --ech=*)
+                add-code "$1" X
+                ;;
+
+            --repeat | --repeat=* | --rep | --rep=N)
+                add-code "$1" b
+                ;;
+
+            # Cursor Positioning
+            --up | --up=* | --cuu | --cuu=*)
+                add-code "$1" A
+                ;;
+
+            --down | --down=* | --cud | --cud=*)
+                add-code "$1" B
+                ;;
+
+            --forward | --forward=* | --cuf | --cuf=*)
+                add-code "$1" C
+                ;;
+
+            --backward | --backward=*| --cub | --cub=*)
+                add-code "$1" D
+                ;;
+
+            --next-line | --next-line=* | --cnl | --cnl=*)
+                add-code "$1" E
+                ;;
+
+            --prev-line | --prev-line=* | --cpl | --cpl=*)
+                add-code "$1" F
+                ;;
+
+            --column | --column=* | --cha | --cha=*)
+                add-code "$1" G
+                ;;
+
+            --position | --position=* | --cup | --cup=*)
+                add-code "$1" H
+                ;;
+
+            --tab-forward | --tab-forward=* | --cht | --cht=*)
+                add-code "$1" I
+                ;;
+
+            --tab-backward | --tab-backward=* | --cbt | --cbt=*)
+                add-code "$1" Z
+                ;;
+
+            --column-relative | --column-relative=* | --hpr | --hpr=*)
+                add-code "$1" 'a'
+                ;;
+
+            --line | --line=* | --vpa | --vpa=*)
+                add-code "$1" 'd'
+                ;;
+
+            --line-relative | --line-relative=* | --vpr | --vpr=*)
+                add-code "$1" 'e'
+                ;;
+
+            --save-cursor)
+                OUTPUT="$OUTPUT${CSI}s"
+                SUFFIX="${CSI}u$SUFFIX"
+                ;;
+
+            --restore-cursor)
+                OUTPUT="$OUTPUT${CSI}u"
+                ;;
+
+            --hide-cursor)
+                OUTPUT="$OUTPUT${CSI}?25l"
+                SUFFIX="${CSI}?25h"
+                ;;
+
+            --show-cursor)
+                OUTPUT="$OUTPUT${CSI}?25h"
+                ;;
+
+            # Colors - Attributes
+            --bold)
+                add-color 1 22
+                ;;
+
+            --faint)
+                add-color 2 22
+                ;;
+
+            --italic)
+                add-color 3 23
+                ;;
+
+            --underline)
+                add-color 4 24
+                ;;
+
+            --blink)
+                add-color 5 25
+                ;;
+
+            --inverse)
+                add-color 7 27
+                ;;
+
+            --invisible)
+                add-color 8 28
+                ;;
+
+            --strike)
+                add-color 9 20
+                ;;
+
+            --fraktur)
+                add-color 20 23
+                ;;
+
+            --double-underline)
+                add-color 21 24
+                ;;
+
+            --frame)
+                add-color 51 54
+                ;;
+
+            --encircle)
+                add-color 52 54
+                ;;
+
+            --overline)
+                add-color 53 55
+                ;;
+
+            # Colors - Foreground
+            --black)
+                add-color 30 39
+                ;;
+
+            --red)
+                add-color 31 39
+                ;;
+
+            --green)
+                add-color 32 39
+                ;;
+
+            --yellow)
+                add-color 33 39
+                ;;
+
+            --blue)
+                add-color 34 39
+                ;;
+
+            --magenta)
+                add-color 35 39
+                ;;
+
+            --cyan)
+                add-color 36 39
+                ;;
+
+            --white)
+                add-color 37 39
+                ;;
+
+            --black-intense)
+                add-color 90 39
+                ;;
+
+            --red-intense)
+                add-color 91 39
+                ;;
+
+            --green-intense)
+                add-color 92 39
+                ;;
+
+            --yellow-intense)
+                add-color 93 39
+                ;;
+
+            --blue-intense)
+                add-color 94 39
+                ;;
+
+            --magenta-intense)
+                add-color 95 39
+                ;;
+
+            --cyan-intense)
+                add-color 96 39
+                ;;
+
+            --white-intense)
+                add-color 97 39
+                ;;
+
+            # Colors - Background
+            --bg-black)
+                add-color 40 49
+                ;;
+
+            --bg-red)
+                add-color 41 49
+                ;;
+
+            --bg-green)
+                add-color 42 49
+                ;;
+
+            --bg-yellow)
+                add-color 43 49
+                ;;
+
+            --bg-blue)
+                add-color 44 49
+                ;;
+
+            --bg-magenta)
+                add-color 45 49
+                ;;
+
+            --bg-cyan)
+                add-color 46 49
+                ;;
+
+            --bg-white)
+                add-color 47 49
+                ;;
+
+            --bg-black-intense)
+                add-color 100 49
+                ;;
+
+            --bg-red-intense)
+                add-color 101 49
+                ;;
+
+            --bg-green-intense)
+                add-color 102 49
+                ;;
+
+            --bg-yellow-intense)
+                add-color 103 49
+                ;;
+
+            --bg-blue-intense)
+                add-color 104 49
+                ;;
+
+            --bg-magenta-intense)
+                add-color 105 49
+                ;;
+
+            --bg-cyan-intense)
+                add-color 106 49
+                ;;
+
+            --bg-white-intense)
+                add-color 107 49
+                ;;
+
+            # Colors - Reset
+            --reset-attrib)
+                OUTPUT="$OUTPUT${CSI}22;23;24;25;27;28;29;54;55m"
+                ;;
+
+            --reset-foreground)
+                OUTPUT="$OUTPUT${CSI}39m"
+                ;;
+
+            --reset-background)
+                OUTPUT="$OUTPUT${CSI}39m"
+                ;;
+
+            --reset-color)
+                OUTPUT="$OUTPUT${CSI}0m"
+                ;;
+
+            # Reporting
+            --report-position)
+                report 6n "$CSI" R || exit 1
+                echo "${REPORT//;/,}"
+                ;;
+
+            --report-window-state)
+                report 11t "$CSI" t || exit 1
+                case "$REPORT" in
+                    1)
+                        echo "open"
+                        ;;
+
+                    2)
+                        echo "iconified"
+                        ;;
+
+                    *)
+                        echo "unknown ($REPORT)"
+                        ;;
+                esac
+                ;;
+
+            --report-window-position)
+                report 13t "${CSI}3;" t || exit 1
+                echo "${REPORT//;/,}"
+                ;;
+
+            --report-window-pixels)
+                report 14t "${CSI}4;" t || exit 1
+                echo "${REPORT//;/,}"
+                ;;
+
+            --report-window-chars)
+                report 18t "${CSI}8;" t || exit 1
+                echo "${REPORT//;/,}"
+                ;;
+
+            --report-screen-chars)
+                report 19t "${CSI}9;" t || exit 1
+                echo "${REPORT//;/,}"
+                ;;
+
+            --report-icon)
+                report 20t "${OSC}L" "$ST" || exit 1
+                echo "${REPORT}"
+                ;;
+
+            --report-title)
+                report 21t "${OSC}l" "$ST" || exit 1
+                echo "${REPORT}"
+                ;;
+
+            # Miscellaneous
+            --color-table)
+                color-table
+                ;;
+
+            --icon=*)
+                OUTPUT="$OUTPUT${OSC}1;${1#*=}$ST"
+                ;;
+
+            --title=*)
+                OUTPUT="$OUTPUT${OSC}2;${1#*=}$ST"
+                ;;
+
+            --no-restore)
+                RESTORE=false
+                ;;
+
+            -n | --newline)
+                NEWLINE=true
+                ;;
+
+            --escape)
+                ESCAPE=true
+                ;;
+
+            --bell)
+                OUTPUT="$OUTPUT$BELL"
+                ;;
+
+            --reset)
+                # 0m - reset all colors and attributes
+                # 2J - clear terminal
+                # 1;1H - move to 1,1
+                # ?25h - show cursor
+                OUTPUT="$OUTPUT${CSI}0m${CSI}2J${CSI}1;1H${CSI}?25h"
+                ;;
+
+            --)
+                CONTINUE=false
+                shift
+                ;;
+
+            *)
+                CONTINUE=false
+                ;;
+        esac
+
+        if $CONTINUE; then
             shift
-            ;;
+        fi
+    done
 
-        *)
-            CONTINUE=false
-            ;;
-    esac
+    echo -n "$OUTPUT"
 
-    if $CONTINUE; then
-        shift
+    if $ESCAPE; then
+        echo -en "${1+"$@"}"
+    else
+        echo -n "${1+"$@"}"
     fi
-done
 
-echo -n "$OUTPUT"
+    if $RESTORE; then
+        echo -n "$SUFFIX"
+    fi
 
-if $ESCAPE; then
-    echo -en "${1+"$@"}"
-else
-    echo -n "${1+"$@"}"
-fi
+    if $NEWLINE; then
+        echo ""
+    fi
+}
 
-if $RESTORE; then
-    echo -n "$SUFFIX"
-fi
-
-if $NEWLINE; then
-    echo ""
-fi
+[[ "$0" == "${BASH_SOURCE[0]}" ]] && main "$@" # Run if not sourced
