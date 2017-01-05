@@ -6,7 +6,7 @@
 # Licensed under the MIT license with an additional non-advertising clause
 # See http://github.com/fidian/ansi
 
-add-code() {
+ansi::addCode() {
     local N
 
     if [[ "$1" == *=* ]]; then
@@ -19,7 +19,7 @@ add-code() {
     OUTPUT="$OUTPUT$CSI$N$2"
 }
 
-add-color() {
+ansi::addColor() {
     OUTPUT="$OUTPUT$CSI${1}m"
 
     if [ ! -z "$2" ]; then
@@ -27,24 +27,24 @@ add-color() {
     fi
 }
 
-color-table() {
+ansi::colorTable() {
     local FNB_LOWER FNB_UPPER PADDED
 
-    FNB_LOWER="$(colorize 2 22 f)n$(colorize 1 22 b)"
-    FNB_UPPER="$(colorize 2 22 F)N$(colorize 1 22 B)"
-    echo -n "bold $(colorize 1 22 Sample)               "
-    echo -n "faint $(colorize 2 22 Sample)              "
-    echo "italic $(colorize 3 23 Sample)"
-    echo -n "underline $(colorize 4 24 Sample)          "
-    echo -n "blink $(colorize 5 25 Sample)              "
-    echo "inverse $(colorize 7 27 Sample)"
-    echo "invisible $(colorize 8 28 Sample)"
-    echo -n "strike $(colorize 9 29 Sample)             "
-    echo -n "fraktur $(colorize 20 23 Sample)            "
-    echo "double-underline $(colorize 21 24 Sample)"
-    echo -n "frame $(colorize 51 54 Sample)              "
-    echo -n "encircle $(colorize 52 54 Sample)           "
-    echo "overline $(colorize 53 55 Sample)"
+    FNB_LOWER="$(ansi::colorize 2 22 f)n$(ansi::colorize 1 22 b)"
+    FNB_UPPER="$(ansi::colorize 2 22 F)N$(ansi::colorize 1 22 B)"
+    echo -n "bold $(ansi::colorize 1 22 Sample)               "
+    echo -n "faint $(ansi::colorize 2 22 Sample)              "
+    echo "italic $(ansi::colorize 3 23 Sample)"
+    echo -n "underline $(ansi::colorize 4 24 Sample)          "
+    echo -n "blink $(ansi::colorize 5 25 Sample)              "
+    echo "inverse $(ansi::colorize 7 27 Sample)"
+    echo "invisible $(ansi::colorize 8 28 Sample)"
+    echo -n "strike $(ansi::colorize 9 29 Sample)             "
+    echo -n "fraktur $(ansi::colorize 20 23 Sample)            "
+    echo "double-underline $(ansi::colorize 21 24 Sample)"
+    echo -n "frame $(ansi::colorize 51 54 Sample)              "
+    echo -n "encircle $(ansi::colorize 52 54 Sample)           "
+    echo "overline $(ansi::colorize 53 55 Sample)"
     echo ""
     echo "             black   red     green   yellow  blue    magenta cyan    white"
     for BG in 40:black 41:red 42:green 43:yellow 44:blue 45:magenta 46:cyan 47:white; do
@@ -75,21 +75,21 @@ color-table() {
     echo "    Intense color:  F = faint, N = normal, B = bold."
 }
 
-colorize() {
+ansi::colorize() {
     echo -n "$CSI${1}m$3$CSI${2}m"
 }
 
-is-ansi-supported() {
+ansi::isAnsiSupported() {
     # Idea:  CSI c
     # Response = CSI ? 6 [234] ; 2 2 c
     # The "22" means ANSI color
     echo "can't tell yet"
 }
 
-report() {
+ansi::report() {
     local BUFF C
 
-    REPORT=""
+    report=""
     echo -n "$CSI$1"
     read -r -N ${#2} -s -t 1 BUFF
 
@@ -100,13 +100,13 @@ report() {
     read -r -N ${#3} -s -t 1 BUFF
 
     while [ "$BUFF" != "$3" ]; do
-        REPORT="$REPORT${BUFF:0:1}"
+        report="$report${BUFF:0:1}"
         read -r -N 1 -s -t 1 C || exit 1
         BUFF="${BUFF:1}$C"
     done
 }
 
-show-help() {
+ansi::showHelp() {
     cat <<EOF
 Generate ANSI escape codes
 
@@ -213,7 +213,7 @@ Miscellaneous:
 EOF
 }
 
-main() {
+ansi() {
     # Handle long options until we hit an unrecognized thing
     local CONTINUE=true
     local RESTORE=true
@@ -230,101 +230,101 @@ main() {
     while $CONTINUE; do
         case "$1" in
             --help | -h | -\?)
-                show-help
+                ansi::showHelp
                 ;;
 
             # Display Manipulation
             --insert-chars | --insert-chars=* | --ich | --ich=*)
-                add-code "$1" @
+                ansi::addCode "$1" @
                 ;;
 
             --erase-display | --erase-display=* | --ed | --ed=*)
-                add-code "$1" J
+                ansi::addCode "$1" J
                 ;;
 
             --erase-line | --erase-line=* | --el | --el=*)
-                add-code "$1" K
+                ansi::addCode "$1" K
                 ;;
 
             --insert-lines | --insert-lines=* | --il | --il=*)
-                add-code "$1" L
+                ansi::addCode "$1" L
                 ;;
 
             --delete-lines | --delete-lines=* | --dl | --dl=*)
-                add-code "$1" M
+                ansi::addCode "$1" M
                 ;;
 
             --delete-chars | --delete-chars=* | --dch | --dch=*)
-                add-code "$1" P
+                ansi::addCode "$1" P
                 ;;
 
             --scroll-up | --scroll-up=* | --su | --su=*)
-                add-code "$1" S
+                ansi::addCode "$1" S
                 ;;
 
             --scroll-down | --scroll-down=* | --sd | --sd=*)
-                add-code "$1" T
+                ansi::addCode "$1" T
                 ;;
 
             --erase-chars | --erase-chars=* | --ech | --ech=*)
-                add-code "$1" X
+                ansi::addCode "$1" X
                 ;;
 
             --repeat | --repeat=* | --rep | --rep=N)
-                add-code "$1" b
+                ansi::addCode "$1" b
                 ;;
 
             # Cursor Positioning
             --up | --up=* | --cuu | --cuu=*)
-                add-code "$1" A
+                ansi::addCode "$1" A
                 ;;
 
             --down | --down=* | --cud | --cud=*)
-                add-code "$1" B
+                ansi::addCode "$1" B
                 ;;
 
             --forward | --forward=* | --cuf | --cuf=*)
-                add-code "$1" C
+                ansi::addCode "$1" C
                 ;;
 
             --backward | --backward=*| --cub | --cub=*)
-                add-code "$1" D
+                ansi::addCode "$1" D
                 ;;
 
             --next-line | --next-line=* | --cnl | --cnl=*)
-                add-code "$1" E
+                ansi::addCode "$1" E
                 ;;
 
             --prev-line | --prev-line=* | --cpl | --cpl=*)
-                add-code "$1" F
+                ansi::addCode "$1" F
                 ;;
 
             --column | --column=* | --cha | --cha=*)
-                add-code "$1" G
+                ansi::addCode "$1" G
                 ;;
 
             --position | --position=* | --cup | --cup=*)
-                add-code "$1" H
+                ansi::addCode "$1" H
                 ;;
 
             --tab-forward | --tab-forward=* | --cht | --cht=*)
-                add-code "$1" I
+                ansi::addCode "$1" I
                 ;;
 
             --tab-backward | --tab-backward=* | --cbt | --cbt=*)
-                add-code "$1" Z
+                ansi::addCode "$1" Z
                 ;;
 
             --column-relative | --column-relative=* | --hpr | --hpr=*)
-                add-code "$1" 'a'
+                ansi::addCode "$1" 'a'
                 ;;
 
             --line | --line=* | --vpa | --vpa=*)
-                add-code "$1" 'd'
+                ansi::addCode "$1" 'd'
                 ;;
 
             --line-relative | --line-relative=* | --vpr | --vpr=*)
-                add-code "$1" 'e'
+                ansi::addCode "$1" 'e'
                 ;;
 
             --save-cursor)
@@ -347,185 +347,185 @@ main() {
 
             # Colors - Attributes
             --bold)
-                add-color 1 22
+                ansi::addColor 1 22
                 ;;
 
             --faint)
-                add-color 2 22
+                ansi::addColor 2 22
                 ;;
 
             --italic)
-                add-color 3 23
+                ansi::addColor 3 23
                 ;;
 
             --underline)
-                add-color 4 24
+                ansi::addColor 4 24
                 ;;
 
             --blink)
-                add-color 5 25
+                ansi::addColor 5 25
                 ;;
 
             --inverse)
-                add-color 7 27
+                ansi::addColor 7 27
                 ;;
 
             --invisible)
-                add-color 8 28
+                ansi::addColor 8 28
                 ;;
 
             --strike)
-                add-color 9 20
+                ansi::addColor 9 20
                 ;;
 
             --fraktur)
-                add-color 20 23
+                ansi::addColor 20 23
                 ;;
 
             --double-underline)
-                add-color 21 24
+                ansi::addColor 21 24
                 ;;
 
             --frame)
-                add-color 51 54
+                ansi::addColor 51 54
                 ;;
 
             --encircle)
-                add-color 52 54
+                ansi::addColor 52 54
                 ;;
 
             --overline)
-                add-color 53 55
+                ansi::addColor 53 55
                 ;;
 
             # Colors - Foreground
             --black)
-                add-color 30 39
+                ansi::addColor 30 39
                 ;;
 
             --red)
-                add-color 31 39
+                ansi::addColor 31 39
                 ;;
 
             --green)
-                add-color 32 39
+                ansi::addColor 32 39
                 ;;
 
             --yellow)
-                add-color 33 39
+                ansi::addColor 33 39
                 ;;
 
             --blue)
-                add-color 34 39
+                ansi::addColor 34 39
                 ;;
 
             --magenta)
-                add-color 35 39
+                ansi::addColor 35 39
                 ;;
 
             --cyan)
-                add-color 36 39
+                ansi::addColor 36 39
                 ;;
 
             --white)
-                add-color 37 39
+                ansi::addColor 37 39
                 ;;
 
             --black-intense)
-                add-color 90 39
+                ansi::addColor 90 39
                 ;;
 
             --red-intense)
-                add-color 91 39
+                ansi::addColor 91 39
                 ;;
 
             --green-intense)
-                add-color 92 39
+                ansi::addColor 92 39
                 ;;
 
             --yellow-intense)
-                add-color 93 39
+                ansi::addColor 93 39
                 ;;
 
             --blue-intense)
-                add-color 94 39
+                ansi::addColor 94 39
                 ;;
 
             --magenta-intense)
-                add-color 95 39
+                ansi::addColor 95 39
                 ;;
 
             --cyan-intense)
-                add-color 96 39
+                ansi::addColor 96 39
                 ;;
 
             --white-intense)
-                add-color 97 39
+                ansi::addColor 97 39
                 ;;
 
             # Colors - Background
             --bg-black)
-                add-color 40 49
+                ansi::addColor 40 49
                 ;;
 
             --bg-red)
-                add-color 41 49
+                ansi::addColor 41 49
                 ;;
 
             --bg-green)
-                add-color 42 49
+                ansi::addColor 42 49
                 ;;
 
             --bg-yellow)
-                add-color 43 49
+                ansi::addColor 43 49
                 ;;
 
             --bg-blue)
-                add-color 44 49
+                ansi::addColor 44 49
                 ;;
 
             --bg-magenta)
-                add-color 45 49
+                ansi::addColor 45 49
                 ;;
 
             --bg-cyan)
-                add-color 46 49
+                ansi::addColor 46 49
                 ;;
 
             --bg-white)
-                add-color 47 49
+                ansi::addColor 47 49
                 ;;
 
             --bg-black-intense)
-                add-color 100 49
+                ansi::addColor 100 49
                 ;;
 
             --bg-red-intense)
-                add-color 101 49
+                ansi::addColor 101 49
                 ;;
 
             --bg-green-intense)
-                add-color 102 49
+                ansi::addColor 102 49
                 ;;
 
             --bg-yellow-intense)
-                add-color 103 49
+                ansi::addColor 103 49
                 ;;
 
             --bg-blue-intense)
-                add-color 104 49
+                ansi::addColor 104 49
                 ;;
 
             --bg-magenta-intense)
-                add-color 105 49
+                ansi::addColor 105 49
                 ;;
 
             --bg-cyan-intense)
-                add-color 106 49
+                ansi::addColor 106 49
                 ;;
 
             --bg-white-intense)
-                add-color 107 49
+                ansi::addColor 107 49
                 ;;
 
             # Colors - Reset
@@ -547,13 +547,13 @@ main() {
 
             # Reporting
             --report-position)
-                report 6n "$CSI" R || exit 1
-                echo "${REPORT//;/,}"
+                ansi::report 6n "$CSI" R || exit 1
+                echo "${report//;/,}"
                 ;;
 
             --report-window-state)
-                report 11t "$CSI" t || exit 1
-                case "$REPORT" in
+                ansi::report 11t "$CSI" t || exit 1
+                case "$report" in
                     1)
                         echo "open"
                         ;;
@@ -563,44 +563,44 @@ main() {
                         ;;
 
                     *)
-                        echo "unknown ($REPORT)"
+                        echo "unknown ($report)"
                         ;;
                 esac
                 ;;
 
             --report-window-position)
-                report 13t "${CSI}3;" t || exit 1
-                echo "${REPORT//;/,}"
+                ansi::report 13t "${CSI}3;" t || exit 1
+                echo "${report//;/,}"
                 ;;
 
             --report-window-pixels)
-                report 14t "${CSI}4;" t || exit 1
-                echo "${REPORT//;/,}"
+                ansi::report 14t "${CSI}4;" t || exit 1
+                echo "${report//;/,}"
                 ;;
 
             --report-window-chars)
-                report 18t "${CSI}8;" t || exit 1
-                echo "${REPORT//;/,}"
+                ansi::report 18t "${CSI}8;" t || exit 1
+                echo "${report//;/,}"
                 ;;
 
             --report-screen-chars)
-                report 19t "${CSI}9;" t || exit 1
-                echo "${REPORT//;/,}"
+                ansi::report 19t "${CSI}9;" t || exit 1
+                echo "${report//;/,}"
                 ;;
 
             --report-icon)
-                report 20t "${OSC}L" "$ST" || exit 1
-                echo "${REPORT}"
+                ansi::report 20t "${OSC}L" "$ST" || exit 1
+                echo "${report}"
                 ;;
 
             --report-title)
-                report 21t "${OSC}l" "$ST" || exit 1
-                echo "${REPORT}"
+                ansi::report 21t "${OSC}l" "$ST" || exit 1
+                echo "${report}"
                 ;;
 
             # Miscellaneous
             --color-table)
-                color-table
+                ansi::colorTable
                 ;;
 
             --icon=*)
@@ -667,4 +667,6 @@ main() {
     fi
 }
 
-[[ "$0" == "${BASH_SOURCE[0]}" ]] && main "$@" # Run if not sourced
+
+# Run if not sourced
+[[ "$0" == "${BASH_SOURCE[0]}" ]] && ansi "$@"
