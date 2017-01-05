@@ -213,20 +213,14 @@ Miscellaneous:
 EOF
 }
 
-main() {
-    # Handle long options until we hit an unrecognized thing
-    local CONTINUE=true
-    local RESTORE=true
-    local NEWLINE=false
-    local ESCAPE=false
-    local ESC=$'\033'
-    local CSI="${ESC}["
-    local OSC="${ESC}]"
-    local ST="${ESC}\\"
-    local OUTPUT=""
-    local SUFFIX=""
-    local BELL=$'\007'
+ansi() {
+    local CONTINUE=true RESTORE=true NEWLINE=false ESCAPE=false
+    local OUTPUT="" SUFFIX=""
 
+    local ESC=$'\033' BELL=$'\007'
+    local CSI="${ESC}[" OSC="${ESC}]" ST="${ESC}\\"
+
+    # Handle long options until we hit an unrecognized thing
     while $CONTINUE; do
         case "$1" in
             --help | -h | -\?)
@@ -667,4 +661,4 @@ main() {
     fi
 }
 
-[[ "$0" == "${BASH_SOURCE[0]}" ]] && main "$@" # Run if not sourced
+[[ "$0" == "${BASH_SOURCE[0]}" ]] && ansi "$@" # Run if not sourced
