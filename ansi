@@ -35,7 +35,7 @@ ansi::colorTable() {
     printf 'bold %s               ' "$(ansi::colorize 1 22 Sample)"
     printf 'faint %s              ' "$(ansi::colorize 2 22 Sample)"
     printf 'italic %s\n'            "$(ansi::colorize 3 23 Sample)"
-    printf 'underlink %s          ' "$(ansi::colorize 4 24 Sample)"
+    printf 'underline %s          ' "$(ansi::colorize 4 24 Sample)"
     printf 'blink %s              ' "$(ansi::colorize 5 25 Sample)"
     printf 'inverse %s\n'           "$(ansi::colorize 7 27 Sample)"
     printf 'invisible %s\n'         "$(ansi::colorize 8 28 Sample)"
