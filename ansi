@@ -32,65 +32,65 @@ color-table() {
 
     FNB_LOWER="$(colorize 2 22 f)n$(colorize 1 22 b)"
     FNB_UPPER="$(colorize 2 22 F)N$(colorize 1 22 B)"
-    echo -n "bold $(colorize 1 22 Sample)               "
-    echo -n "faint $(colorize 2 22 Sample)              "
-    echo "italic $(colorize 3 23 Sample)"
-    echo -n "underline $(colorize 4 24 Sample)          "
-    echo -n "blink $(colorize 5 25 Sample)              "
-    echo "inverse $(colorize 7 27 Sample)"
-    echo "invisible $(colorize 8 28 Sample)"
-    echo -n "strike $(colorize 9 29 Sample)             "
-    echo -n "fraktur $(colorize 20 23 Sample)            "
-    echo "double-underline $(colorize 21 24 Sample)"
-    echo -n "frame $(colorize 51 54 Sample)              "
-    echo -n "encircle $(colorize 52 54 Sample)           "
-    echo "overline $(colorize 53 55 Sample)"
-    echo ""
-    echo "             black   red     green   yellow  blue    magenta cyan    white"
+    printf 'bold %s               ' "$(colorize 1 22 Sample)"
+    printf 'faint %s              ' "$(colorize 2 22 Sample)"
+    printf 'italic %s\n'            "$(colorize 3 23 Sample)"
+    printf 'underlink %s          ' "$(colorize 4 24 Sample)"
+    printf 'blink %s              ' "$(colorize 5 25 Sample)"
+    printf 'inverse %s\n'           "$(colorize 7 27 Sample)"
+    printf 'invisible %s\n'         "$(colorize 8 28 Sample)"
+    printf 'strike %s             ' "$(colorize 9 29 Sample)"
+    printf 'fraktur %s            ' "$(colorize 20 23 Sample)"
+    printf 'double-underline%s\n'   "$(colorize 21 24 Sample)"
+    printf 'frame %s              ' "$(colorize 51 54 Sample)"
+    printf 'encircle %s           ' "$(colorize 52 54 Sample)"
+    printf 'overline%s\n'           "$(colorize 53 55 Sample)"
+    printf '\n'
+    printf '             black   red     green   yellow  blue    magenta cyan    white\n'
     for BG in 40:black 41:red 42:green 43:yellow 44:blue 45:magenta 46:cyan 47:white; do
         PADDED="bg-${BG:3}           "
         PADDED="${PADDED:0:13}"
-        echo -n "$PADDED"
+        printf '%s' "$PADDED"
         for FG in 30 31 32 33 34 35 36 37; do
-            echo -n "$CSI${BG:0:2};${FG}m"
-            echo -n "$FNB_LOWER"
-            echo -n "$CSI$(( FG + 60 ))m"
-            echo -n "$FNB_UPPER"
-            echo -n "${CSI}0m  "
+            printf '%s%s;%sm' "$CSI"       "${BG:0:2}"      "${FG}"
+            printf '%s'       "$FNB_LOWER"
+            printf '%s%sm'    "$CSI"       "$(( FG + 60 ))"
+            printf '%s'       "$FNB_UPPER"
+            printf '%s0m  '   "${CSI}"
         done
-        echo ""
-        echo -n "  +intense   "
+        printf '\n'
+        printf '  +intense   '
         for FG in 30 31 32 33 34 35 36 37; do
-            echo -n "$CSI$(( ${BG:0:2} + 60 ));${FG}m"
-            echo -n "$FNB_LOWER"
-            echo -n "$CSI$(( FG + 60 ))m"
-            echo -n "$FNB_UPPER"
-            echo -n "${CSI}0m  "
+            printf '%s%s;%sm' "$CSI"       "$(( ${BG:0:2} + 60 ))" "${FG}"
+            printf '%s'       "$FNB_LOWER"
+            printf '%s%sm'    "$CSI"       "$(( FG + 60 ))"
+            printf '%s'       "$FNB_UPPER"
+            printf '%s0m  '   "${CSI}"
         done
-        echo ""
+        printf '\n'
     done
-    echo ""
-    echo "Legend:"
-    echo "    Normal color:  f = faint, n = normal, b = bold."
-    echo "    Intense color:  F = faint, N = normal, B = bold."
+    printf '\n'
+    printf 'Legend:\n'
+    printf '    Normal color:  f = faint, n = normal, b = bold.\n'
+    printf '    Intense color:  F = faint, N = normal, B = bold.\n'
 }
 
 colorize() {
-    echo -n "$CSI${1}m$3$CSI${2}m"
+    printf '%s%sm%s%s%sm' "$CSI" "$1" "$3" "$CSI" "$2"
 }
 
 is-ansi-supported() {
     # Idea:  CSI c
     # Response = CSI ? 6 [234] ; 2 2 c
     # The "22" means ANSI color
-    echo "can't tell yet"
+    printf "can't tell yet\n"
 }
 
 report() {
     local BUFF C
 
     REPORT=""
-    echo -n "$CSI$1"
+    printf '%s%s' "$CSI" "$1"
     read -r -N ${#2} -s -t 1 BUFF
 
     if [ "$BUFF" != "$2" ]; then
@@ -548,54 +548,54 @@ main() {
             # Reporting
             --report-position)
                 report 6n "$CSI" R || exit 1
-                echo "${REPORT//;/,}"
+                printf '%s\n' "${REPORT//;/,}"
                 ;;
 
             --report-window-state)
                 report 11t "$CSI" t || exit 1
                 case "$REPORT" in
                     1)
-                        echo "open"
+                        printf 'open\n'
                         ;;
 
                     2)
-                        echo "iconified"
+                        printf 'iconified\n'
                         ;;
 
                     *)
-                        echo "unknown ($REPORT)"
+                        printf 'unknown (%s)\n' "$REPORT"
                         ;;
                 esac
                 ;;
 
             --report-window-position)
                 report 13t "${CSI}3;" t || exit 1
-                echo "${REPORT//;/,}"
+                printf '%s\n' "${REPORT//;/,}"
                 ;;
 
             --report-window-pixels)
                 report 14t "${CSI}4;" t || exit 1
-                echo "${REPORT//;/,}"
+                printf '%s\n' "${REPORT//;/,}"
                 ;;
 
             --report-window-chars)
                 report 18t "${CSI}8;" t || exit 1
-                echo "${REPORT//;/,}"
+                printf '%s\n'  "${REPORT//;/,}"
                 ;;
 
             --report-screen-chars)
                 report 19t "${CSI}9;" t || exit 1
-                echo "${REPORT//;/,}"
+                printf '%s\n' "${REPORT//;/,}"
                 ;;
 
             --report-icon)
                 report 20t "${OSC}L" "$ST" || exit 1
-                echo "${REPORT}"
+                printf '%s\n' "$REPORT"
                 ;;
 
             --report-title)
                 report 21t "${OSC}l" "$ST" || exit 1
-                echo "${REPORT}"
+                printf '%s\n' "$REPORT"
                 ;;
 
             # Miscellaneous
@@ -650,20 +650,20 @@ main() {
         fi
     done
 
-    echo -n "$OUTPUT"
+    printf '%s' "$OUTPUT"
 
     if $ESCAPE; then
-        echo -en "${1+"$@"}"
+        printf '%s' "${1+"$@"}"
     else
-        echo -n "${1+"$@"}"
+        printf '%s' "${1+"$@"}"
     fi
 
     if $RESTORE; then
-        echo -n "$SUFFIX"
+        printf '%s' "$SUFFIX"
     fi
 
     if $NEWLINE; then
-        echo ""
+        printf '\n'
     fi
 }
 
