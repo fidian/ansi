@@ -13,6 +13,15 @@ Installation
 
 Download `ansi` and put it somewhere in your path.  Make sure that it is executable (`chmod a+x ansi` works well).  Bash will need to be present, but it is often installed by default.  No external commands are used; this only uses bash's built-in features.
 
+    # Download
+    curl -O https://git.io/ansi
+
+    # Make executable
+    chmod 755 ansi
+
+    # Copy to somewhere in your path
+    sudo mv ansi /usr/local/bin/
+
 Not all features will work with all terminals.  Your terminal determines if particular codes work.
 
 
