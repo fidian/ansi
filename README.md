@@ -14,7 +14,7 @@ Installation
 Download `ansi` and put it somewhere in your path.  Make sure that it is executable (`chmod a+x ansi` works well).  Bash will need to be present, but it is often installed by default.  No external commands are used; this only uses bash's built-in features.
 
     # Download
-    curl -O https://git.io/ansi
+    curl -OL git.io/ansi
 
     # Make executable
     chmod 755 ansi
