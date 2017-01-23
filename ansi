@@ -90,6 +90,7 @@ ansi::report() {
     local BUFF C
 
     REPORT=""
+    printf "%s%s" "$CSI" "$1"
     read -r -N ${#2} -s -t 1 BUFF
 
     if [ "$BUFF" != "$2" ]; then
