@@ -669,4 +669,6 @@ ansi() {
 
 
 # Run if not sourced
-if [[ "$0" == "${BASH_SOURCE[0]}" ]]; then ansi "$@"; fi
+if [[ "$0" == "${BASH_SOURCE[0]}" ]]; then
+    ansi "$@"
+fi
