@@ -47,27 +47,33 @@ ansi::colorTable() {
     printf 'overline%s\n'           "$(ansi::colorize 53 55 Sample)"
     printf '\n'
     printf '             black   red     green   yellow  blue    magenta cyan    white\n'
-    for BG in 40:black 41:red 42:green 43:yellow 44:blue 45:magenta 46:cyan 47:white; do
+    for BG in 40:black 41:red 42:green 43:yellow 44:blue 45:magenta 46:cyan 47:white xx:no-bg; do
         PADDED="bg-${BG:3}           "
         PADDED="${PADDED:0:13}"
         printf '%s' "$PADDED"
+        BG=${BG:0:2}
+        if [[ "$BG" == "xx" ]]; then
+            BG=""
+        fi
         for FG in 30 31 32 33 34 35 36 37; do
-            printf '%s%s;%sm' "$CSI"       "${BG:0:2}"      "${FG}"
+            printf '%s%s;%sm' "$CSI"       "$BG"      "${FG}"
             printf '%s'       "$FNB_LOWER"
             printf '%s%sm'    "$CSI"       "$(( FG + 60 ))"
             printf '%s'       "$FNB_UPPER"
             printf '%s0m  '   "${CSI}"
         done
         printf '\n'
-        printf '  +intense   '
-        for FG in 30 31 32 33 34 35 36 37; do
-            printf '%s%s;%sm' "$CSI"       "$(( ${BG:0:2} + 60 ))" "${FG}"
-            printf '%s'       "$FNB_LOWER"
-            printf '%s%sm'    "$CSI"       "$(( FG + 60 ))"
-            printf '%s'       "$FNB_UPPER"
-            printf '%s0m  '   "${CSI}"
-        done
-        printf '\n'
+        if [[ -n "$BG" ]]; then
+            printf '  +intense   '
+            for FG in 30 31 32 33 34 35 36 37; do
+                printf '%s%s;%sm' "$CSI"       "$(( BG + 60 ))" "${FG}"
+                printf '%s'       "$FNB_LOWER"
+                printf '%s%sm'    "$CSI"       "$(( FG + 60 ))"
+                printf '%s'       "$FNB_UPPER"
+                printf '%s0m  '   "${CSI}"
+            done
+            printf '\n'
+        fi
     done
     printf '\n'
     printf 'Legend:\n'
