@@ -86,10 +86,43 @@ ansi::colorize() {
 }
 
 ansi::isAnsiSupported() {
+    local cont c str
+
+    if ! test -t 1; then
+        # stdout is not a terminal
+        return 1
+    fi
+
+    if hash tput &> /dev/null; then
+        if [[ "$(tput colors)" -lt 8 ]]; then
+            return 1
+        fi
+
+        return 0
+    fi
+
+    # Query the console and see if we get ANSI codes back.
+    # CSI 0 c == CSI c == Primary Device Attributes.
     # Idea:  CSI c
     # Response = CSI ? 6 [234] ; 2 2 c
-    # The "22" means ANSI color
-    printf "can't tell yet\n"
+    # The "22" means ANSI color, but terminals don't need to send that back.
+    printf "%s0c" "$CSI"
+    str=
+    cont=true
+
+    while $cont && read -n 1 -s -t 0.1 c; do
+        if [[ -n "$c" ]]; then
+            str+=$c
+        else
+            cont=false
+        fi
+    done
+
+    set | grep ^str=
+
+    # If we get anything back, the terminal is consuming the color codes and
+    # will probably do its best. Let's assume there's color.
+    [[ "$str" == "$CSI?6"[234]";"* ]]
 }
 
 ansi::report() {
@@ -212,7 +245,6 @@ Miscellaneous:
                              afterwards.  With this flag, the color will
                              stay green even when the command finishes.
     -n, --newline            Add a newline at the end.
-    --escape                 Allow text passed in to contain escape sequences.
     --bell                   Add the terminal's bell sequence to the output.
     --reset                  Reset colors, clear screen, show cursor, move
                              cursor to 1,1.
@@ -224,7 +256,6 @@ ansi() {
     local CONTINUE=true
     local RESTORE=true
     local NEWLINE=false
-    local ESCAPE=false
     local ESC=$'\033'
     local CSI="${ESC}["
     local OSC="${ESC}]"
@@ -625,10 +656,6 @@ ansi() {
                 NEWLINE=true
                 ;;
 
-            --escape)
-                ESCAPE=true
-                ;;
-
             --bell)
                 OUTPUT="$OUTPUT$BELL"
                 ;;
@@ -656,16 +683,19 @@ ansi() {
         fi
     done
 
-    printf '%s' "$OUTPUT"
+    if ansi::isAnsiSupported; then
+        printf '%s' "$OUTPUT" "${1-}"
+        shift || :
 
-    if $ESCAPE; then
-        printf '%s' "${1+"$@"}"
+        if [[ "$#" -gt 0 ]]; then
+            printf "${IFS:0:1}%s" "${@}"
+        fi
+
+        if $RESTORE; then
+            printf '%s' "$SUFFIX"
+        fi
     else
         printf '%s' "${1+"$@"}"
-    fi
-
-    if $RESTORE; then
-        printf '%s' "$SUFFIX"
     fi
 
     if $NEWLINE; then
