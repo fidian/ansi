@@ -88,11 +88,6 @@ ansi::colorize() {
 ansi::isAnsiSupported() {
     local cont c str
 
-    if ! test -t 1; then
-        # stdout is not a terminal
-        return 1
-    fi
-
     if hash tput &> /dev/null; then
         if [[ "$(tput colors)" -lt 8 ]]; then
             return 1
