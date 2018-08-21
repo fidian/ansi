@@ -9,5 +9,5 @@ while true; do
     ROW=$(( ROW + 1 ))
     COL=$(( RANDOM % COLS ))
     COL=$(( COL + 1 ))
-    ansi --position=$ROW,$COL --insert-chars
+    ansi -n --position=$ROW,$COL --insert-chars
 done

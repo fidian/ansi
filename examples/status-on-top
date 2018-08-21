@@ -1,17 +1,17 @@
 #!/bin/bash
 
-ansi --erase-display=2 --position=1,1 "Line 1"
+ansi -n --erase-display=2 --position=1,1 "Line 1"
 sleep 1
-ansi --scroll-down --column=1 "Line 2"
+ansi -n --scroll-down --column=1 "Line 2"
 sleep 1
-ansi --scroll-down --column=1 "Newer lines get added to the top"
+ansi -n --scroll-down --column=1 "Newer lines get added to the top"
 sleep 1
-ansi --scroll-down --column=1 "This works well for short lines"
+ansi -n --scroll-down --column=1 "This works well for short lines"
 sleep 1
-ansi --scroll-down --column=1 "If a line wraps, it will overwrite a previous line."
+ansi -n --scroll-down --column=1 "If a line wraps, it will overwrite a previous line."
 sleep 1
-ansi --scroll-down --column=1 "That's a problem this script won't solve."
+ansi -n --scroll-down --column=1 "That's a problem this script won't solve."
 sleep 1
-ansi --scroll-down --column=1 "This example will end in 5 seconds"
+ansi -n --scroll-down --column=1 "This example will end in 5 seconds"
 sleep 5
-ansi --erase-display=2 --position=1,1
+ansi -n --erase-display=2 --position=1,1

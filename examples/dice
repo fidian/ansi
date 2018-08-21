@@ -25,12 +25,10 @@ dice=(
   )
 
 clear
-ansi --bell
+ansi -n --bell
 
-ansi --position=2,5
-ansi --bg-white --black "${dice[RANDOM%6]}"
+ansi --position=2,5 -n --bg-white --black "${dice[RANDOM%6]}"
 
-ansi --position=2,20
-ansi --bg-black --white "${dice[RANDOM%6]}"
+ansi --position=2,20 -n --bg-black --white "${dice[RANDOM%6]}"
 
 echo

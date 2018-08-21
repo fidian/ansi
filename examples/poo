@@ -4,7 +4,7 @@ showLine() {
     local I LEN REPLACED
     LEN="${#1}"
     REPLACED=""
-    ansi --column=$((CENTER - ((LEN + 1) / 2)))
+    ansi -n --column=$((CENTER - ((LEN + 1) / 2)))
     for ((I=0; I < ${#1}; I++)); do
         case "${1:$I:1}" in
             " ")
@@ -69,10 +69,10 @@ POO=(
 CENTER=$(tput cols)
 CENTER=$((CENTER / 2))
 
-ansi --save-cursor --hide-cursor --position=2,1
+ansi -n --save-cursor --hide-cursor --position=2,1
 
 for LINE in "${POO[@]}"; do
     showLine "$LINE"
 done
 
-ansi --show-cursor --restore-cursor
+ansi -n --show-cursor --restore-cursor
