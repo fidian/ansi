@@ -141,6 +141,7 @@ ansi::colorCodes() {
     # for i in 16 22 28 34 40 46; do
     for i in 16 22 28; do
         for j in $i $((i+36)) $((i+72)) $((i+108)) $((i+144)) $((i+180)); do
+            ansi::white
             ansi::bold
 
             for code in $j $((j+1)) $((j+2)) $((j+3)) $((j+4)) $((j+5)); do
@@ -148,6 +149,7 @@ ansi::colorCodes() {
             done
 
             ansi::normal
+            ansi::resetForeground
             printf '    '
             ansi::black
 
