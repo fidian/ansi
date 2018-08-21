@@ -25,12 +25,18 @@ Download `ansi` and put it somewhere in your path.  Make sure that it is executa
 Not all features will work with all terminals.  Your terminal determines if particular codes work.
 
 
+Upgrading Issues
+----------------
+
+The newer version of `ansi` has reversed an earlier decision about newlines at the end.  Previously, calling `ansi test` would write "test" to the screen without a newline and `ansi -n test" would add a newline. As of August 2018, this has switched and `ansi test` will write out "test" with a newline. The `-n` flag is also switched. Sorry for the inconvenience that the earlier decision has caused and future confusion due to this flag switching. The goal is to align more closely with `echo`.
+
+
 Usage
 -----
 
     ansi [OPTIONS] [TEXT TO DISPLAY]
 
-The OPTIONS are numerous and are detailed below.  You can specify as many as you like.  Option processing stops at the first unknown option and at `--`.  Options are applied in the order specified on the command line.  When colors are changed, they are removed in reverse order as long as `--no-restore`  is not used.
+The OPTIONS are numerous and are detailed below.  You can specify as many as you like.  Option processing stops at the first unknown option and at `--`.  Options are applied in the order specified on the command line.  Colors are reset and attributes are restored to default unless `--no-restore` is used.
 
 
 Examples
@@ -82,7 +88,7 @@ The short version of these options comes from the command they are implementing.
 * `--forward[=N]`, `--cuf[=N]`
 * `--backward[=N]`, `--cub[=N]`
 * `--next-line[=N]`, `--cnl[=N]`
-* `--prev-line[=N]`, `--cpl[=N]`
+* `--previous-line[=N]`, `--prev-line[=N]`, `--cpl[=N]`
 * `--column[=N]`, `--cha[=N]`
 * `--position[=ROW][=COL]`, `--cup[=ROW][=COL]`
 * `--tab-forward[=N]` - Move forward N tab stops.
@@ -96,69 +102,57 @@ The short version of these options comes from the command they are implementing.
 * `--show-cursor`
 
 
-Options - Colors (Attributes)
+Options - Text (Attributes)
 -----------------------------
 
-All of these options will automatically reset to normal text unless `--no-reset` is used.
+All of these options will automatically reset to normal text unless `--no-reset` is used. Below, the codes are grouped into similar functionality and the flag to disable that attribute is listed with the group it controls, so you can correlate the flags more easily.
 
-* `--bold`
-* `--faint`
-* `--italic`
-* `--underline`
-* `--blink`
-* `--inverse`
-* `--invisible`
-* `--strike`
-* `--fraktur`
-* `--double-underline`
-* `--frame`
-* `--encircle`
-* `--overline`
+* `--bold` and `--faint` can be reset with `--normal`
+* `--italic` and `--fraktur` can be reset with `--plain`
+* `--underline` and `--double-underline` are reset with `--no-underline`
+* `--blink` and `--rapid-blink` are reset with `--no-blink`
+* `--inverse` is removed with `--no-inverse`
+* `--invisible` is changed back with `--visible`
+* `--strike` is reset with `--no-strike`
+* `--frame` and `--encircle` are reset with `--no-border`
+* `--overline` is removed with `--no-overline`
+* `--ideogram-right`, `--ideogram-right-double`, `--ideogram-left`, `--ideogram-left-double`, and `--ideogram-stress` are all removed with `--reset-ideogram`
+* `--font=NUM` sets the font. `NUM` must be a single digit from 0 through 9. Font 0 is the default font.
 
 
-Options - Colors (Foreground)
+Options - Text (Foreground)
 -----------------------------
 
-All of these options will automatically reset to the default color unless `--no-reset` is used.
+All of these options will automatically reset to the default color unless `--no-reset` is used. To preview the colors, use `--color-table`.
 
-* `--black`
-* `--red`
-* `--yellow`
-* `--blue`
-* `--magenta`
-* `--cyan`
-* `--white`
-* `--black-intense`
-* `--red-intense`
-* `--yellow-intense`
-* `--blue-intense`
-* `--magenta-intense`
-* `--cyan-intense`
-* `--white-intense`
+* `--black` and `--black-intense`
+* `--red` and `--red-intense`
+* `--yellow` and `--yellow-intense`
+* `--blue` and `--blue-intense`
+* `--magenta` and `--magenta-intense`
+* `--cyan` and `--cyan-intense`
+* `--white` and `--white-intense`
+* `--color=CODE` lets you use one of 256 codes - preview the codes using `--color-codes`
+* `--rgb=R,G,B` sets a specific color
 
 
-Options - Colors (Background)
+Options - Text (Background)
 -----------------------------
 
-All of these options will automatically reset to the default color unless `--no-reset` is used.
+All of these options will automatically reset to the default color unless `--no-reset` is used. To preview the colors, use `--color-table`.
 
-* `--bg-black`
-* `--bg-red`
-* `--bg-yellow`
-* `--bg-blue`
-* `--bg-magenta`
-* `--bg-cyan`
-* `--bg-white`
-* `--bg-black-intense`
-* `--bg-red-intense`
-* `--bg-yellow-intense`
-* `--bg-blue-intense`
-* `--bg-magenta-intense`
-* `--bg-cyan-intense`
-* `--bg-white-intense`
+* `--bg-black` and `--bg-black-intense`
+* `--bg-red` and `--bg-red-intense`
+* `--bg-yellow` and `--bg-yellow-intense`
+* `--bg-blue` and `--bg-blue-intense`
+* `--bg-magenta` and `--bg-magenta-intense`
+* `--bg-cyan` and `--bg-cyan-intense`
+* `--bg-white` and `--bg-white-intense`
+* `--bg-color=CODE` lets you use one of 256 codes - preview the codes using `--color-codes`
+* `--bg-rgb=R,G,B` sets a specific color
 
 
-Options - Colors (Reset)
+Options - Text (Reset)
 ------------------------
 
 These options force a reset of colors.  This is useful if you used `--no-reset` or are correcting the appearance of a misbehaving terminal.
@@ -167,6 +161,7 @@ These options force a reset of colors.  This is useful if you used `--no-reset` 
 * `--reset-foreground` - Reset the foreground to default
 * `--reset-background` - Reset the background to default
 * `--reset-color` - Reset all color-related settings
+* `--reset-font` - Reset the font to the primary font
 
 
 Reporting
@@ -189,11 +184,12 @@ All output is written to screen.
 Miscellaneous
 -------------
 
-* `--color-table` - Display a color table
-* `--icon=NAME` - Set the icon
+* `--color-table` - Display a color table.
+* `--color-codes` - Show all of the 256 color codes.
+* `--icon=NAME` - Set the icon.
 * `--title=TITLE` - Set the title of the terminal.  The equals (=) before the `TITLE` parameter is mandatory.  `TITLE` can be empty.
 * `--no-restore` - Do not issue reset codes when changing colors and saving the cursor.  For example, if you use `--green` then the text will automatically be reset to the default color when the command terminates.  With `--no-restore` set, the text will stay green and subsequent commands that output will keep writing in green until something else changes the terminal.
-* `-n`, `--newline` - Add a newline at the end.
+* `-n`, `--no-newline` - Do not add a newline at the end.
 * `--escape` - Allow text passed in to contain escape sequences.
 * `--bell` - Add the terminal's bell sequence to the output.
 * `--reset` - Reset all colors, clear the screen, show the cursor and move to 1,1.
