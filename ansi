@@ -10,11 +10,14 @@ ANSI_ESC=$'\033'
 ANSI_CSI="${ANSI_ESC}["
 ANSI_OSC="${ANSI_ESC}]"
 ANSI_ST="${ANSI_ESC}\\"
-ANSI_BELL=$'\007'
 ANSI_REPORT= # The return value from ansi::report
 
 ansi::backward() {
     printf '%s%sD' "$ANSI_CSI" "${1-}"
+}
+
+ansi::bell() {
+    printf "%s" $'\007'
 }
 
 ansi::black() {
@@ -341,7 +344,7 @@ ansi::eraseChars() {
     printf '%s%sX' "$ANSI_CSI" "${1-}"
 }
 
-ansi::eraseLines() {
+ansi::eraseLine() {
     printf '%s%sK' "$ANSI_CSI" "${1-}"
 }
 
@@ -493,7 +496,8 @@ ansi::plain() {
 }
 
 ansi::position() {
-    printf '%s%sH' "$ANSI_CSI" "${1-}"
+    local position="${1-}"
+    printf '%s%sH' "$ANSI_CSI" "${position/,/;}"
 }
 
 ansi::previousLine() {
@@ -592,6 +596,14 @@ ansi::reportWindowState() {
     esac
 }
 
+ansi::reset() {
+    ansi::resetColor
+    ansi::resetFont
+    ansi::eraseDisplay 2
+    ansi::position "1;1"
+    ansi::showCursor
+}
+
 ansi::resetAttributes() {
     printf '%s22;23;24;25;27;28;29;54;55m' "$ANSI_CSI"
 }
@@ -668,19 +680,19 @@ For instance, using --down will move the cursor down one line and --down=10
 moves the cursor down 10 lines.
 
 Display Manipulation
-    --insert-chars[=N], --ich[=N]
+    --insert-chars[=N], --insert-char[=N], --ich[=N]
                              Insert blanks at cursor, shifting the line right.
     --erase-display[=N], --ed[=N]
                              Erase in display. 0=below, 1=above, 2=all,
                              3=saved.
-    --erase-line[=N], --el[=N]
+    --erase-line=[N], --el[=N]
                              Erase in line. 0=right, 1=left, 2=all.
-    --insert-lines[=N], --il[=N]
-    --delete-lines[=N], --dl[=N]
-    --delete-chars[=N], --dch[=N]
+    --insert-lines[=N], --insert-line[=N], --il[=N]
+    --delete-lines[=N], --delete-line[=N], --dl[=N]
+    --delete-chars[=N], --delete-char[=N], --dch[=N]
     --scroll-up[=N], --su[=N]
     --scroll-down[=N], --sd[=N]
-    --erase-chars[=N], --ech[=N]
+    --erase-chars[=N], --erase-char[=N], --ech[=N]
     --repeat[=N], --rep[=N]  Repeat preceding character N times.
 
 Cursor:
@@ -843,11 +855,11 @@ ansi() {
                 ;;
 
             # Display Manipulation
-            --insert-chars | --ich)
+            --insert-chars | --insert-char | --ich)
                 $supported && ansi::insertChars
                 ;;
 
-            --insert-chars=* | --ich=*)
+            --insert-chars=* | insert-char=* | --ich=*)
                 $supported && ansi::insertChars "${1#*=}"
                 ;;
 
@@ -860,34 +872,34 @@ ansi() {
                 ;;
 
             --erase-line | --el)
-                $supported && ansi::eraseLines
+                $supported && ansi::eraseLine
                 ;;
 
             --erase-line=* | --el=*)
-                $supported && ansi::eraseLines "${1#*=}"
+                $supported && ansi::eraseLine "${1#*=}"
                 ;;
 
-            --insert-lines | --il)
+            --insert-lines | --insert-line | --il)
                 $supported && ansi::insertLines
                 ;;
 
-            --insert-lines=* | --il=*)
+            --insert-lines=* | --insert-line=* | --il=*)
                 $supported && ansi::insertLines "${1#*=}"
                 ;;
 
-            --delete-lines | --dl)
+            --delete-lines | --delete-line | --dl)
                 $supported && ansi::deleteLines
                 ;;
 
-            --delete-lines=* | --dl=*)
+            --delete-lines=* | --delete-line=* | --dl=*)
                 $supported && ansi::deleteLines "${1#*=}"
                 ;;
 
-            --delete-chars | --dch)
+            --delete-chars | --delete-char | --dch)
                 $supported && ansi::deleteChars
                 ;;
 
-            --delete-chars=* | --dch=*)
+            --delete-chars=* | --delete-char=* | --dch=*)
                 $supported && ansi::deleteChars "${1#*=}"
                 ;;
 
@@ -907,11 +919,11 @@ ansi() {
                 $supported && ansi::scrollDown "${1#*=}"
                 ;;
 
-            --erase-chars | --ech)
+            --erase-chars | --erase-char | --ech)
                 $supported && ansi::eraseChars
                 ;;
 
-            --erase-chars=* | --ech=*)
+            --erase-chars=* | --erase-char=* | --ech=*)
                 $supported && ansi::eraseChars "${1#*=}"
                 ;;
 
@@ -1512,8 +1524,16 @@ ansi() {
                 fi
                 ;;
 
+            --icon)
+                $supported && ansi::setIcon ""
+                ;;
+
             --icon=*)
                 $supported && ansi::setIcon "${1#*=}"
+                ;;
+
+            --title)
+                $supported && ansi::setTitle ""
                 ;;
 
             --title=*)
@@ -1529,16 +1549,12 @@ ansi() {
                 ;;
 
             --bell)
-                printf "%s" "$ANSI_BELL"
+                ansi::bell
                 ;;
 
             --reset)
                 $supported || return 0
-                ansi::resetColor
-                ansi::resetFont
-                ansi::eraseDisplay 2
-                ansi::position "1;1"
-                ansi::showCursor
+                ansi::reset
                 ;;
 
             --)
