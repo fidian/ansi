@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# Change to this script's folder
+cd "${0%/*}"
+
+# Load the library into the Bash environment
+. ../ansi
+
+ansi::blue
+echo "This is blue"
+echo "Blue and blue and more blue."
+ansi::italic
+echo "The colors $(ansi::bold)don't automatically reset$(ansi::normal)."
+ansi::resetForeground
+echo "The color was reset, but italics remain at this point."
+ansi::plain
+
+echo "Back to normal."
+
+echo "This is $(ansi::inverse)inverse$(ansi::noInverse) text."
+
+# You can use the command as well, but this no longer runs ansi
+# as an external binary. It uses the function and saves time since
+# it no longer uses a subshell. As proof, we unset the PATH variable
+# before running ANSI so you know it's running a function.
+PATH="" ansi --green "This is running a function"
+
