@@ -125,16 +125,24 @@ ansi::colorCodes() {
 
     printf 'Standard: '
     ansi::bold
+    ansi::white
 
     for code in 0 1 2 3 4 5 6 7; do
+        if [[ "$code" == 7 ]]; then
+            ansi::black
+        fi
         ansi::colorCodePatch "$code"
     done
 
+    ansi::resetForeground
     ansi::normal
     printf '\nIntense:  '
-    ansi::black
+    ansi::white
 
     for code in 8 9 10 11 12 13 14 15; do
+        if [[ "$code" == 9 ]]; then
+            ansi::black
+        fi
         ansi::colorCodePatch "$code"
     done
 
@@ -169,11 +177,13 @@ ansi::colorCodes() {
 
     printf 'Grays:    '
     ansi::bold
+    ansi::white
 
     for code in 232 233 234 235 236 237 238 239 240 241 242 243; do
         ansi::colorCodePatch "$code"
     done
 
+    ansi::resetForeground
     ansi::normal
     printf '\n          '
     ansi::black
