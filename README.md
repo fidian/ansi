@@ -262,7 +262,7 @@ When using this to change the color or perform terminal manipulation, make sure 
     # You must manually reset the colors
     ansi::resetForeground
 
-All of the functions write to stdout except `ansi::report`.
+All of the functions write to stdout except `ansi::report`. That one uses stderr to query the terminal and its result will go into the `ANSI_REPORT` environment variable.
 
 None of the functions care if the terminal supports ANSI unless otherwise noted. They will happily write out ANSI codes even if the terminal will not recognize them.
 
@@ -372,6 +372,7 @@ All of these commands send a special code to the terminal.  The terminal respond
 
 The ANSI codes are written to stdout in order that the terminal might respond immediately. The result of the report is written to stdout.
 
+* `ansi::report` - Helper function to assist with querying the terminal for information. Writes a query to stderr (file descriptor 2), listens for information from stdin (file descriptor 0) and returns the result through the environment variable `ANSI_REPORT`.
 * `ansi::reportPosition` - ROW,COL
 * `ansi::reportWindowState` - "open" or "iconified"
 * `ansi::reportWindowPosition` - X,Y
@@ -395,7 +396,6 @@ The ANSI codes are written to stdout in order that the terminal might respond im
 * `ansi::colorTable` - Show a table of the different standard colors, text attributes, and similar things.
 * `ansi::colorTableLine` - Helper function to show a line of colors.
 * `ansi::isAnsiSupported` - Returns true (0) when ANSI is supported. Tries checking using tools, falls back to querying the terminal.
-* `ansi::report` - Helper function to assist with querying the terminal for information.
 * `ansi::showHelp` - Shows the help for the `ansi` command.
 * `ansi` - This function will act identically to the `ansi` command. Calling `ansi` once the library has been sourced will not spawn a subshell and instead will call functions only, greatly increasing the speed.
 
