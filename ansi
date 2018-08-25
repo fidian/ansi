@@ -10,7 +10,7 @@ ANSI_ESC=$'\033'
 ANSI_CSI="${ANSI_ESC}["
 ANSI_OSC="${ANSI_ESC}]"
 ANSI_ST="${ANSI_ESC}\\"
-ANSI_REPORT= # The return value from ansi::report
+ANSI_REPORT="" # The return value from ansi::report
 
 ansi::backward() {
     printf '%s%sD' "$ANSI_CSI" "${1-}"
@@ -1514,6 +1514,8 @@ ansi() {
                 else
                     ansi::colorCodes
                 fi
+
+                return 0
                 ;;
 
             --color-table)
@@ -1522,6 +1524,8 @@ ansi() {
                 else
                     ansi::colorTable
                 fi
+
+                return 0
                 ;;
 
             --icon)
