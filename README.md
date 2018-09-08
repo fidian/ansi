@@ -60,7 +60,7 @@ Once loaded into the environment, the list of library functions below are availa
 Upgrading Issues
 ----------------
 
-The newer version of `ansi` has reversed an earlier decision about newlines at the end.  Previously, calling `ansi test` would write "test" to the screen without a newline and `ansi -n test" would add a newline. As of August 2018, this has switched and `ansi test` will write out "test" with a newline. The `-n` flag is also switched. Sorry for the inconvenience that the earlier decision has caused and future confusion due to this flag switching. The goal is to align more closely with `echo`.
+The newer version of `ansi` has reversed an earlier decision about newlines at the end.  Previously, calling `ansi test` would write "test" to the screen without a newline and `ansi -n test` would add a newline. As of August 2018, this has switched and `ansi test` will write out "test" with a newline. The `-n` flag is also switched. Sorry for the inconvenience that the earlier decision has caused and future confusion due to this flag switching. The goal is to align more closely with `echo`.
 
 
 Usage
