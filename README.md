@@ -41,6 +41,7 @@ Download `ansi` and put it somewhere in your path.  Make sure that it is executa
     sudo mv ansi /usr/local/bin/
 
 Not all features will work with all terminals.  Your terminal determines if particular codes work.
+You can override the terminal detection logic and force `ansi` to output color codes with the environment variable `ANSI_FORCE_SUPPORT` set to any non-empty value.
 
 
 ### [BPM] Installation

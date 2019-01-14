@@ -427,6 +427,13 @@ ansi::invisible() {
 }
 
 ansi::isAnsiSupported() {
+    # Optionally override detection logic
+    # to support post processors that interpret color codes _after_ output is generated.
+    # Use environment variable "ANSI_FORCE_SUPPORT=<anything>" to enable the override.
+    if [[ -n "${ANSI_FORCE_SUPPORT-}" ]]; then
+        return 0
+    fi
+
     if hash tput &> /dev/null; then
         if [[ "$(tput colors)" -lt 8 ]]; then
             return 1
