@@ -1610,7 +1610,7 @@ ansi() {
         fi
 
         if $restoreText; then
-            m="$m10$m22$m23$m24$m25$m27$m28$m29$m$m39$m49$m54$m55$m65"
+            m="$m10$m22$m23$m24$m25$m27$m28$m29$m39$m49$m54$m55$m65"
             printf '%s%sm' "$ANSI_CSI" "${m%;}"
         fi
     fi
