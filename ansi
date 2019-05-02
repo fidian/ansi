@@ -1520,6 +1520,12 @@ ansi() {
                 m65="65;"
                 ;;
 
+            --ideogram-stress)
+                $supported && ansi::ideogramStress
+                restoreText=true
+                m65="65;"
+                ;;
+
             --reset-ideogram)
                 $supported && ansi::noIdeogram
                 ;;
