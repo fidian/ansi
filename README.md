@@ -3,9 +3,11 @@ ANSI Code Generator
 
 ![](images/headline.png)
 
-This bash script will generate the proper ANSI escape sequences to move the cursor around the screen, make text bold, add colors and do much more.  It is designed to help you colorize words and bits of text.
+This bash script will generate the proper [ANSI escape sequences][ANSI sequences] to move the cursor around the screen, make text bold, add colors and do much more.  It is designed to help you colorize words and bits of text.
 
 If it helps, you can think of it as a curses / ncurses library for bash, or a tool that helps you using tricks from DOS's ANSI.SYS.  Or you might consider this to be your magic highlighter that has always been missing from bash.
+
+I have compiled a list of all of the [ANSI escape sequences][ANSI sequences] that I know and that this program supports. Additions and corrections are welcomed!
 
 
 Demonstrations
@@ -96,7 +98,7 @@ It often helps when one can see how to use a new tool, so here's how this librar
     # Find out how many lines the terminal can display
     ansi --report-window-chars | cut -d , -f 1
 
-Need more?  Check out the [examples/](examples/) folder.
+Need more?  Check out the [examples/](examples/) folder for some nifty demos.
 
 
 Command-Line Options
@@ -240,20 +242,20 @@ Library Functions
 
 If you decide to leverage `ansi` as a Bash library and you load its functions into your environment, you gain access to the following functions. You will notice that they, for the most part, mirror the option names of the command-line program. These functions only do their one task and do not reset the terminal when done. Any exceptions to this are clearly called out.
 
-In order to source `ansi` into the environment you will have to use one of a few different methods.
+In order to source `ansi` into the environment you will have to use one of a few different methods:
 
-Loading via [BPM], after you add `ansi` to your dependencies in your `bpm.ini` file.
+1. Loading via [BPM], after you add `ansi` to your dependencies in your `bpm.ini` file.
 
-    . bpm
-    bpm::include ansi
+        . bpm
+        bpm::include ansi
 
-Loading when `ansi` is installed manually into your path somewhere. Coincidentally, this also works when you use [BPM] to install the tool globally.
+2. Loading when `ansi` is installed manually into your path somewhere. Coincidentally, this also works when you use [BPM] to install the tool globally.
 
-    . ansi
+        . ansi
 
-Loading when you include `ansi` in your project.
+3. Loading when you include `ansi` in your project.
 
-    . path/to/the/file/ansi
+        . path/to/the/file/ansi
 
 When using this to change the color or perform terminal manipulation, make sure to send the reset codes.
 
@@ -415,4 +417,5 @@ License
 This project is licensed under a MIT style license with an additional non-advertising clause.  See [LICENSE.md](LICENSE.md) for more information.
 
 
+[ANSI sequences]: docs/ansi-escape-sequences.md
 [BPM]: https://github.com/bpm-rocks/bpm/

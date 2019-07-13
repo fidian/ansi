@@ -1,0 +1,24 @@
+diff --git a/ansi b/ansi
+index a728e5a..c9b38be 100755
+--- a/ansi
++++ b/ansi
+@@ -2,14 +2,17 @@
+ #
+ # ANSI code generator
+ #
+-# © Copyright 2015 Tyler Akins
+-# Licensed under the MIT license with an additional non-advertising clause
++# © Copyright 2019 Tyler Akins
++# Licensed under the MIT license with an additional non-advertising clause.
+ # See http://github.com/fidian/ansi
+ 
+ ANSI_ESC=$'\033'
+ ANSI_CSI="${ANSI_ESC}["
++ANSI_CSI_8BIT=$'\233'
+ ANSI_OSC="${ANSI_ESC}]"
++ANSI_OSC_8BIT=$'\235'
+ ANSI_ST="${ANSI_ESC}\\"
++ANSI_ST_8BIT=$'\234'
+ ANSI_REPORT="" # The return value from ansi::report
+ 
+ ansi::backward() {
