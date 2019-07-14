@@ -673,5 +673,6 @@ http://ascii-table.com/ansi-escape-sequences.php
 https://en.wikipedia.org/wiki/ANSI_escape_code
 http://www.shaels.net/index.php/propterm/documents/14-ansi-protocol
 examples of Mosh
+https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
 
 * Wikipedia's [ANSI Escape Code](https://en.wikipedia.org/wiki/ANSI_escape_code)
