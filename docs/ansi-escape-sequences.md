@@ -37,18 +37,25 @@ The `CSI` translates into `ESC [` according to the table below, and `ESC` means 
 
 This table lists the necessary prefixes and character codes.
 
-| Code  | Description                 | 7-bit              | 8-bit               | Source        |
-|-------|-----------------------------|--------------------|---------------------|---------------|
-| ESC   | Escape                      | **033, 27, 0x1b**  | **033, 27, 0x1b**   | [E-CS]        |
-| SP    | Space                       | **024, 20, 0x14**  | **024, 20, 0x14**   | [E-CS]        |
-| GRAVE | Grave accent                | **0140, 96, 0x60** | **0140, 96, 0x60**  | [E-CS]        |
-| CSI   | Control Sequence Introducer | `ESC [`            | **0233, 155, 0x9b** | [E-CF] [E-CS] |
-| ST    | String Terminator           | `ESC \`            | **0234, 156, 0x9c** | [E-CF] [E-CS] |
-| OSC   | Operating System Command    | `ESC ]`            | **0235, 157, 0x9d** | [E-CF] [E-CS] |
+| Code  | Description                 | 7-bit               | 8-bit               | Source        |
+|-------|-----------------------------|---------------------|---------------------|---------------|
+| LF    | Line Feed                   | **012, 10, 0x0a**   | **012, 10, 0x0a**   | [E-CF] [W-CC] |
+| VT    | Vertical Tabulation         | **013, 11, 0x0b**   | **013, 11, 0x0b**   | [E-CF] [W-CC] |
+| FF    | Form Feed                   | **014, 12, 0x0c**   | **014, 12, 0x0c**   | [E-CF] [W-CC] |
+| CR    | Carriage Return             | **015, 13, 0x0d**   | **015, 13, 0x0d**   | [E-CF] [W-CC] |
+| SP    | Space                       | **024, 20, 0x14**   | **024, 20, 0x14**   | [E-CS] [W-CC] |
+| ESC   | Escape                      | **033, 27, 0x1b**   | **033, 27, 0x1b**   | [E-CS] [W-CC] |
+| GRAVE | Grave Accent                | **0140, 96, 0x60**  | **0140, 96, 0x60**  | [E-CS] [W-GA] |
+| NEL   | Next Line                   | **0205, 133, 0x85** | **0205, 133, 0x85** | [E-CF] [W-CC] |
+| RI    | Reverse Line Feed           | **0215, 141, 0x8d** | **0215, 141, 0x8d** | [E-CF] [W-CC] |
+| CSI   | Control Sequence Introducer | `ESC [`             | **0233, 155, 0x9b** | [E-CF] [E-CS] |
+| ST    | String Terminator           | `ESC \`             | **0234, 156, 0x9c** | [E-CF] [E-CS] |
+| OSC   | Operating System Command    | `ESC ]`             | **0235, 157, 0x9d** | [E-CF] [E-CS] |
 
 Normally `GRAVE` would not need to be called out, but it's a special character in Markdown. Because this document uses Markdown, it can't easily be represented in the document. It's also known as a backwards apostrophe or a backtick.
 
 A practical reference of these codes can be found at [Wikipedia's C0 and C1 control codes](https://en.wikipedia.org/wiki/C0_and_C1_control_codes) and [ECMA's Control Functions For Coded Character Sets][E-CF]. The explanation of the allowed byte values is decrypted from [ECMA's 8-Bit Single-Byte Coded Graphic Character Set][E-CS].
+
 
 ### `CSI`
 
@@ -119,7 +126,10 @@ Display Modification
 | `CSI {n} L` | (IL: Insert Line) Insert `{n}` lines starting at cursor.                      | `1`     | [E-CF] |
 | `CSI {n} M` | (DL: Delete Line) Delete `{n}` lines, shifting other lines to close the gap.  | `1`     | [E-CF] |
 | `CSI {n} P` | (DCH: Delete Character) Delete `{n}` characters and shifts rest of line left. | `1`     | [E-CF] |
+| `CSI {n} U` | (NP: Next Page) Display the `{n}`th page to be displayed.                     | `1`     | [E-CF] |
+| `CSI {n} V` | (PP: Preceding Page) Display the `{n}`th previous page.                       | `1`     | [E-CF] |
 | `CSI {n} X` | (ECH: Erase Character) Erase `{n}` characters from cursor and going forward.  | `1`     | [E-CF] |
+| `CSI {n} b` | (REP: Repeat) Repeat preceding character `{n}` times.                         | `1`     | [E-CF] |
 
 
 ### `J`: Erase In Page (ED)
@@ -156,7 +166,11 @@ Fonts and Glyphs
 | `CSI {h} ; {w} SP B` | (GSM: Graphic Size Modification) Change the text height and width. *See below.*          | `100;100` | [E-CF] |
 | `CSI {p} SP C`       | (GSM: Graphic Size Selection) Change the size of the font. *See below.*                  | *none*    | [E-CF] |
 | `CSI {f} ; {m} SP D` | (FNT: Font Selection) Changes font number `{f}` to be font `{m}`. *See below.*           | `0;0`     | [E-CF] |
+| `CSI {p} SP Z`       | (PEC: Presentation Expand Or Contract) Set character spacing. *See below.*               | `0`       | [E-CF] |
+| `CSI {p..} SP ]`     | (SAPV: Select Alternative Presentation Variants) Display text differently. *See below.*  | `0`       | [E-CF] |
+| `CSI {p} SP \`       | (SACS: Set Additional Character Separation) Sets character separation. *See below.*      | `0`       | [E-CF] |
 | `CSI {n} SP _`       | (GCC: Graphic Character Combination) Overlays  characters as a single byte. *See below.* | `0`       | [E-CF] |
+| `CSI {p} H`          | (QUAD: Quad) Align and justify characters. *See below.*                                  | `0`       | [E-CF] |
 
 
 ### `SP B`: Graphic Size Modification (GSM)
@@ -193,17 +207,89 @@ Select the primary or secondary font to use for displaying subsequent occurrence
 | `9`   | Ninth alternative font.   | [E-CF] |
 
 
+### `SP Z`: Presentation Expand or Contract (PEC)
+
+Format: `CSI {p} SP Z`
+
+Sets the spacing and extent of the characters.
+
+| `{p}` | Description                                          | Source |
+|-------|------------------------------------------------------|--------|
+| `0`   | Normal.                                              | [E-CF] |
+| `1`   | Expanded. Multiplied by a factor not greater than 2. | [E-CF] |
+| `2`   | Condensed. Multiplied by a factor not less than 0.5. | [E-CF] |
+
+
+### `SP ]`: Select Alternative Presentation Variants
+
+Format: `CSI {p..} SP ]`
+
+Sets one or more variants for the presentation of subsequent text. The default `{p..}` is 0.
+
+| `{p}` | Description                                                               | Source |
+|-------|---------------------------------------------------------------------------|--------|
+| `0`   | Default presentation. Clears any presentation variant.                    | [E-CF] |
+| `1`   | Decimal digits are displayed in Latin script.                             | [E-CF] |
+| `2`   | Decimal digits are displayed in Arabic script.                            | [E-CF] |
+| `3`   | Flip parenthesis, brackets, braces, greater-than/less-than, etc.          | [E-CF] |
+| `4`   | Mirror mathematical operators around the vertical axis.                   | [E-CF] |
+| `5`   | The following character is displayed in its isolated form.                | [E-CF] |
+| `6`   | The following character is displayed in its initial form.                 | [E-CF] |
+| `7`   | The following character is displayed in its medial form.                  | [E-CF] |
+| `8`   | The following character is displayed in its final form.                   | [E-CF] |
+| `9`   | Change periods into the symbol for full stop.                             | [E-CF] |
+| `10`  | Change periods into commas.                                               | [E-CF] |
+| `11`  | Vowels are presented above of below the preceding character.              | [E-CF] |
+| `12`  | Vowels are presented after the preceding character.                       | [E-CF] |
+| `13`  | Contextual shape determination of Arabic script and LAM-ALEPH ligatures.  | [E-CF] |
+| `14`  | Contextual shape determination of Arabic scripts excluding all ligatures. | [E-CF] |
+| `15`  | Cancels effects of `3` and `4`.                                           | [E-CF] |
+| `16`  | Vowels are not presented.                                                 | [E-CF] |
+| `17`  | Italicized characters are slanted the opposite direction.                 | [E-CF] |
+| `18`  | Do not use shape determination - display character as they are stored.    | [E-CF] |
+| `19`  | Same as `18` but does not apply to numbers.                               | [E-CF] |
+| `20`  | The digit symbols are device dependent.                                   | [E-CF] |
+| `21`  | Apply `5`, `6`, `7`, and `8` until canceled.                              | [E-CF] |
+| `22`  | Cancels the effects of `21`.                                              | [E-CF] |
+
+
+### `SP \`: Set Additional Character Separation (SACS)
+
+Format: `CSI {p} SP \`
+
+Establishes inter-character escapement for subsequent text. This remains in effect until the next Set Additional Character Separation, Set Reduced Character Separation, Carriage Return, Line Feed, or Next Line. `{p}` defaults to 0 and is measured by the unit established by Select Size Unit.
+
+
 ### `SP _`: Graphic Character Combination (GCC)
 
 Format: `CSI {p} SP _`
 
 Overlays two or more characters as a single character for display. `{p}` defaults to `0`. If more than two are to be overlaid, mark the start and end of the string of symbols.
 
-| `{p}` | Description | Source |
-|---|---|---|
-| `0` | Overlay two characters. | [E-CF] |
-[ `1` | Mark the beginning of overlaid characters. | [E-CF] |
-[ `2` | Mark the end of overlaid characters. | [E-CF] |
+| `{p}` | Description                                | Source |
+|-------|--------------------------------------------|--------|
+| `0`   | Overlay two characters.                    | [E-CF] |
+| `1`   | Mark the beginning of overlaid characters. | [E-CF] |
+| `2`   | Mark the end of overlaid characters.       | [E-CF] |
+
+
+### `H`: Quad (QUAD)
+
+Format: `CSI {p} H`
+
+Indicate the end of a string of characters that should be positioned on a single line according to `{p}`, which defaults to `0`.
+
+| `{p}` | Description                         | Source |
+|-------|-------------------------------------|--------|
+| `0`   | Left aligned.                       | [E-CF] |
+| `1`   | Left aligned and fill with leader.  | [E-CF] |
+| `2`   | Centered.                           | [E-CF] |
+| `3`   | Centered and fill with leader.      | [E-CF] |
+| `4`   | Right aligned.                      | [E-CF] |
+| `5`   | Right aligned and fill with header. | [E-CF] |
+| `6`   | Flush to both margins.              | [E-CF] |
+
+The beginning of the string to be positioned is indicated by the preceding occurrence of Quad, Form Feed, Character and Line Position, Line Feed, Next Line, Page Position Absolute, Page Position Backward, Page Position Forward, Reverse Line Feed, Line Position Absolute, Line Position Backward, Line Position Forward, or Line Tabulation.
 
 
 Input
@@ -338,17 +424,17 @@ Format: `CSI {p..} F`
 
 Marks the beginning of a string of characters that should be formatted according to the values of `{p}`. This remains in effect until the next Justify command.
 
-| `{p}` | Description | Source |
-|---|---|---|
-| `0` | No justification, end of justification of preceding text. | [E-CF] |
-| `1` | Word fill. | [E-CF] |
-| `2` | Word space. | [E-CF] |
-| `3` | Letter space. | [E-CF] |
-| `4` | Hyphenation. | [E-CF] |
-| `5` | Left aligned. | [E-CF] |
-| `6` | Centered. | [E-CF] |
-| `7` | Right aligned. | [E-CF] |
-| `8` | Italian hypenation. | [E-CF] |
+| `{p}` | Description                                               | Source |
+|-------|-----------------------------------------------------------|--------|
+| `0`   | No justification, end of justification of preceding text. | [E-CF] |
+| `1`   | Word fill.                                                | [E-CF] |
+| `2`   | Word space.                                               | [E-CF] |
+| `3`   | Letter space.                                             | [E-CF] |
+| `4`   | Hyphenation.                                              | [E-CF] |
+| `5`   | Left aligned.                                             | [E-CF] |
+| `6`   | Centered.                                                 | [E-CF] |
+| `7`   | Right aligned.                                            | [E-CF] |
+| `8`   | Italian hypenation.                                       | [E-CF] |
 
 
 ### `N`: Erase in Field (EF)
@@ -399,17 +485,170 @@ Sets up a new qualified area. The area starts at the current cursor position and
 | `11`  | Order of input characters is reversed. | [E-CF] |
 
 
+Alternative Output, Printing
+----------------------------
+
+| Code           | Description                                                                    | Default | Source |
+|----------------|--------------------------------------------------------------------------------|---------|--------|
+| `CSI {p} SP J` | (PFS: Page Format Selection) Set the paper size for text. *See below.*         | `0`     | [E-CF] |
+| `CSI {n} SP P` | (PPA: Page Position Absolute) Sets active data position and page. *See below.* | `1`     | [E-CF] |
+| `CSI {n} SP Q` | (PPR: Page Position Forward) Sets active data position and page. *See below.*  | `1`     | [E-CF] |
+| `CSI {n} SP R` | (PPB: Page Position Backward) Sets active data position and page. *See below.* | `1`     | [E-CF] |
+| `CSI {n} SP e` | (SCO: Select Character Orientation) Rotate text. *See below.*                  | `0`     | [E-CF] |
+| `CSI {n} \`    | (PTX: Parallel Texts) Controls display of parallel texts. *See below.*         | `0`     | [E-CF] |
+| `CSI {p} i`    | (MC: Media Copy) Start a data transfer. *See below.*                           | `0`     | [E-CF] |
+| `CSI {p..} l`  | (RM: Reset Mode) Set receiving device mode. *See below.*                       | *none*  | [E-CF] |
+
+
+### `SP J`: Page Format Selection (PFS)
+
+Format: `CSI {p} SP J`
+
+Establishes the available area for the imaging of pages of text based on paper size. The pages are introduced by the subsequent occurrence of Form Feed characters in the data stream. The default is `0`.
+
+| `{p}` | Description                           | Source |
+|-------|---------------------------------------|--------|
+| `0`   | Tall basic text communication format. | [E-CF] |
+| `1`   | Wide basic text communication format. | [E-CF] |
+| `2`   | Tall basic A4 format.                 | [E-CF] |
+| `3`   | Wide basic A4 format.                 | [E-CF] |
+| `4`   | Tall North American letter format.    | [E-CF] |
+| `5`   | Wide North American letter format.    | [E-CF] |
+| `6`   | Tall extended A4 format.              | [E-CF] |
+| `7`   | Wide extended A4 format.              | [E-CF] |
+| `8`   | Tall North American legal format.     | [E-CF] |
+| `9`   | Wide North American legal format.     | [E-CF] |
+| `10`  | A4 short lines format.                | [E-CF] |
+| `11`  | A4 long lines format.                 | [E-CF] |
+| `12`  | B5 short lines format.                | [E-CF] |
+| `13`  | B5 long lines format.                 | [E-CF] |
+| `14`  | B4 short lines format.                | [E-CF] |
+| `15`  | B4 long lines format.                 | [E-CF] |
+
+
+### `SP P`: Page Position Absolute (PPA)
+
+Format: `CSI {p} SP P`
+
+Causes the active data position to be moved in the data component to the corresponding character position on the `{n}`th page.
+
+
+### `SP Q`: Page Position Forward (PPB)
+
+Format: `CSI {p} SP Q`
+
+Causes the active data position to be moved in the data component to the corresponding character position on the `{n}`th following page.
+
+
+### `SP R`: Page Position Backward (PPB)
+
+Format: `CSI {p} SP R`
+
+Causes the active data position to be moved in the data component to the corresponding character position on the `{n}`th preceding page.
+
+
+### `SP e`: Select Character Orientation (SCO)
+
+Format: `CSI {p} SP e`
+
+Changes the amount of rotation for the following characters. Default value of `{p}` is 0.
+
+| `{p}` | Description  | Source |
+|-------|--------------|--------|
+| `0`   | 0 degrees.   | [E-CF] |
+| `1`   | 45 degrees.  | [E-CF] |
+| `2`   | 90 degrees.  | [E-CF] |
+| `3`   | 135 degrees. | [E-CF] |
+| `4`   | 180 degrees. | [E-CF] |
+| `5`   | 225 degrees. | [E-CF] |
+| `6`   | 270 degrees. | [E-CF] |
+| `7`   | 315 degrees. | [E-CF] |
+
+
+### `\`: Parallel Texts (PTX)
+
+Format: `CSI {n} \`
+
+Delimits strings of graphic characters that are communicated one after another in the data stream but that are intended to be presented in parallel with one another, usually in adjacent lines. The default is `0`.
+
+| `{p}` | Description                                                          | Source |
+|-------|----------------------------------------------------------------------|--------|
+| `0`   | End of parallel texts.                                               | [E-CF] |
+| `1`   | Beginning of a string of principal parallel text.                    | [E-CF] |
+| `2`   | Beginning of a string of supplementary parallel text.                | [E-CF] |
+| `3`   | Beginning of a string of supplementary Japanese phonetic annotation. | [E-CF] |
+| `4`   | Beginning of a string of supplementary Chinese phonetic annotation.  | [E-CF] |
+| `5`   | End of a string of supplementary phonetic annotations.               | [E-CF] |
+
+There's significantly more detail in [E-CF], section 8.3.99 regarding this code.
+
+
+### `i`: Media Copy (MC)
+
+Format: `CSI {p} i`
+
+Start a data transfer to/from an auxiliary output/input device or to enable/disable the relay of the received data stream to/from an auxiliary output/input device. `{p}` defaults to `0`.
+
+| `{p}` | Description                                       | Source |
+|-------|---------------------------------------------------|--------|
+| `0`   | Start transfer to a primary auxiliary device.     | [E-CF] |
+| `1`   | Start transfer from a primary auxiliary device.   | [E-CF] |
+| `2`   | Start transfer to a secondary auxiliary device.   | [E-CF] |
+| `3`   | Start transfer from a secondary auxiliary device. | [E-CF] |
+| `4`   | Stop transfer to a primary auxiliary device.      | [E-CF] |
+| `5`   | Stop transfer from a primary auxiliary device.    | [E-CF] |
+| `6`   | Stop transfer to a secondary auxiliary device.    | [E-CF] |
+| `7`   | Stop transfer from a secondary auxiliary device.  | [E-CF] |
+
+
+### `l`: Reset Mode (RM)
+
+Format: `CSI {p..} l`
+
+Causes the receiving device to reset its mode as specified by the values of `{p}`. There is no default value.
+
+Private modes may be implemented using private parameters.
+
+| `{p}` | Description                                | Source |
+|-------|--------------------------------------------|--------|
+| `1`   | Guarded area transfer mode (GATM).         | [E-CF] |
+| `2`   | Keyboard action mode (KAM).                | [E-CF] |
+| `3`   | Control representation mode (CRM).         | [E-CF] |
+| `4`   | Intersection replacement mode (IRM).       | [E-CF] |
+| `5`   | Status report transfer mode (SRTM).        | [E-CF] |
+| `6`   | Erasure mode (ERM).                        | [E-CF] |
+| `7`   | Line editing mode (VEM).                   | [E-CF] |
+| `8`   | Bidirectional support mode (BDSM).         | [E-CF] |
+| `9`   | Device component select mode (DCSM).       | [E-CF] |
+| `10`  | Character editing mode (HEM).              | [E-CF] |
+| `11`  | Positioning unit mode (PUM).               | [E-CF] |
+| `12`  | Send/receive mode (SRM).                   | [E-CF] |
+| `13`  | Format effector action mode (FEAM).        | [E-CF] |
+| `14`  | Format effector transfer mode (FETM).      | [E-CF] |
+| `15`  | Multiple area transfer mode (MATM).        | [E-CF] |
+| `16`  | Transfer termination mode (TTM).           | [E-CF] |
+| `17`  | Selected area transfer mode (SATM).        | [E-CF] |
+| `18`  | Tabulation stop mode (TSM).                | [E-CF] |
+| `19`  | Shall not be used.                         | [E-CF] |
+| `20`  | Shall not be used.                         | [E-CF] |
+| `21`  | Graphic rendition combination mode (GRCM). | [E-CF] |
+| `22`  | Zero default mode (ZDM).                   | [E-CF] |
+
+
 Sources
 -------
 
 * E-CF: [ECMA's Control Functions For Coded Character Sets][E-CF]
 * E-CS: [ECMA's 8-Bit Single-Byte Coded Graphic Character Sets][E-CS]
-* Wikipedia's [ANSI Escape Code](https://en.wikipedia.org/wiki/ANSI_escape_code)
+* W-CC: [Wikipedia's C0 and C1 control codes][W-CC]
+* W-GA: [Wikipedia's Grave Accent][W-GA]
 
 [E-CF]: http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-048.pdf
 [E-CS]: https://www.ecma-international.org/publications/files/ECMA-ST/Ecma-114.pdf
+[W-CC]: https://en.wikipedia.org/wiki/C0_and_C1_control_codes
+[W-GA]: https://en.wikipedia.org/wiki/Grave_accent
 
-CSI 8.3.73 52
+CSI 8.3.110 67
 OSC
 
 ECMA codes
@@ -434,3 +673,5 @@ http://ascii-table.com/ansi-escape-sequences.php
 https://en.wikipedia.org/wiki/ANSI_escape_code
 http://www.shaels.net/index.php/propterm/documents/14-ansi-protocol
 examples of Mosh
+
+* Wikipedia's [ANSI Escape Code](https://en.wikipedia.org/wiki/ANSI_escape_code)
