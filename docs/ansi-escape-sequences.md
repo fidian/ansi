@@ -35,7 +35,7 @@ The `CSI` translates into `ESC [` according to the table below, and `ESC` means 
     // C
     printf("%c[34m", 0x1b);
 
-This table lists the necessary prefixes and character codes.
+This table lists the necessary prefixes and character codes for the rest of the escape sequences.
 
 | Code  | Description                 | 7-bit               | 8-bit               | Source        |
 |-------|-----------------------------|---------------------|---------------------|---------------|
@@ -109,27 +109,70 @@ Cursor Movement
 | `CSI {n} F`       | (CNL: Cursor Preceding Line) Moves cursor to first character of the `{n}` preceding line.      | `1`     | [E-CF] |
 | `CSI {c} G`       | (CHA: Cursor Character Absolute) Move to column `{c}` on the current line.                     | `1`     | [E-CF] |
 | `CSI {l} ; {c} H` | (CUP: Cursor Position) Move to line `{l}`, column `{c}`.                                       | `1;1`   | [E-CF] |
+| `CSI {p} ^`       | (SIMD: Select Implicit Movement Direction) Sets cursor movement direction. *See below.*        | `0`     | [E-CF] |
 | `CSI {c} GRAVE`   | (HPA: Character Position Absolute) Move to column `{c}` in the active line.                    | `1`     | [E-CF] |
 | `CSI {n} a`       | (HPR: Character Position Forward) Move the cursor forwards `{n}` characters.                   | `1`     | [E-CF] |
 | `CSI {l} ; {c} f` | (HVP: Character Line and Position) Move the cursor down `{l}` lines and forward `{c}` columns. | `1;1`   | [E-CF] |
 | `CSI {n} j`       | (HPB: Character Position Backward) Move the cursor backwards `{n}` characters.                 | `1`     | [E-CF] |
 
 
+### `^`: Set Implicit Movement Direction (SIMD)
+
+Format: `CSI {p} ^`
+
+Sets the cursor movement direction relative to the character progression. Default value is `0`.
+
+| `{p}` | Description | Source |
+|---|---|---|
+| `0` | Same as character progression. | [E-CF] |
+| `1` | Opposite of character progression. | [E-CF] |
+
+
 Display Modification
 --------------------
 
-| Code        | Description                                                                   | Default | Source |
-|-------------|-------------------------------------------------------------------------------|---------|--------|
-| `CSI {n} @` | (ICH: Insert Character) Insert `{n}` blanks at the cursor position.           | `1`     | [E-CF] |
-| `CSI {p} J` | (ED: Erase In Page) Erase some or all of the screen. *See below.*             | `0`     | [E-CF] |
-| `CSI {p} K` | (EL: Erase In Line) Erase some or all of the current line. *See below.*       | `0`     | [E-CF] |
-| `CSI {n} L` | (IL: Insert Line) Insert `{n}` lines starting at cursor.                      | `1`     | [E-CF] |
-| `CSI {n} M` | (DL: Delete Line) Delete `{n}` lines, shifting other lines to close the gap.  | `1`     | [E-CF] |
-| `CSI {n} P` | (DCH: Delete Character) Delete `{n}` characters and shifts rest of line left. | `1`     | [E-CF] |
-| `CSI {n} U` | (NP: Next Page) Display the `{n}`th page to be displayed.                     | `1`     | [E-CF] |
-| `CSI {n} V` | (PP: Preceding Page) Display the `{n}`th previous page.                       | `1`     | [E-CF] |
-| `CSI {n} X` | (ECH: Erase Character) Erase `{n}` characters from cursor and going forward.  | `1`     | [E-CF] |
-| `CSI {n} b` | (REP: Repeat) Repeat preceding character `{n}` times.                         | `1`     | [E-CF] |
+| Code                 | Description                                                                      | Default | Source |
+|----------------------|----------------------------------------------------------------------------------|---------|--------|
+| `CSI {n} SP @`       | (SL: Scroll Left) Moves displayed text left `{n}` columns.                       | `1`     | [E-CF] |
+| `CSI {n} SP A`       | (SR: Scroll Right) Moves displayed text right `{n}` columns.                     | `1`     | [E-CF] |
+| `CSI {d} ; {e} SP S` | (SPD: Set Presentation Direction) Sets text direction. *See below.*              | `0;0`   | [E-CF] |
+| `CSI {n} @`          | (ICH: Insert Character) Insert `{n}` blanks at the cursor position.              | `1`     | [E-CF] |
+| `CSI {p} J`          | (ED: Erase In Page) Erase some or all of the screen. *See below.*                | `0`     | [E-CF] |
+| `CSI {p} K`          | (EL: Erase In Line) Erase some or all of the current line. *See below.*          | `0`     | [E-CF] |
+| `CSI {n} L`          | (IL: Insert Line) Insert `{n}` lines starting at cursor.                         | `1`     | [E-CF] |
+| `CSI {n} M`          | (DL: Delete Line) Delete `{n}` lines, shifting other lines to close the gap.     | `1`     | [E-CF] |
+| `CSI {n} P`          | (DCH: Delete Character) Delete `{n}` characters and shifts rest of line left.    | `1`     | [E-CF] |
+| `CSI {n} S`          | (SU: Scroll Up) Scroll display up `{n}` lines.                                   | `1`     | [E-CF] |
+| `CSI {n} T`          | (SD: Scroll Down) Scroll display down `{n}` lines.                               | `1`     | [E-CF] |
+| `CSI {n} U`          | (NP: Next Page) Display the `{n}`th page to be displayed.                        | `1`     | [E-CF] |
+| `CSI {n} V`          | (PP: Preceding Page) Display the `{n}`th previous page.                          | `1`     | [E-CF] |
+| `CSI {n} X`          | (ECH: Erase Character) Erase `{n}` characters from cursor and going forward.     | `1`     | [E-CF] |
+| `CSI {n} b`          | (REP: Repeat) Repeat preceding character `{n}` times.                            | `1`     | [E-CF] |
+| `CSI {p..} m`        | (SGR: Select Graphic Rendition) Set colors, fonts, and many others. *See below.* | `0`     | [E-CF] |
+
+
+### `SP S`: Set Presentation Direction (SPD)
+
+Format: `CSI {d} ; {e} SP S`
+
+Sets the presentation direction according to `{d}` and with effector `{e}`. The default value is `0;0`.
+
+| `{d}` | Description | Source |
+|---|---|---|
+| `0` | Horizontal lines from top to bottom. Lines fill left to right. | [E-CF] |
+| `1` | Vertical lines from right to left. Lines fill top to bottom. | [E-CF] |
+| `2` | Vertical lines from left to right. Lines fill top to bottom. | [E-CF] |
+| `3` | Horizontal lines from top to bottom. Lines fill right to left. | [E-CF] |
+| `4` | Vertical lines from left to right. Lines fill bottom to top. | [E-CF] |
+| `5` | Horizontal lines from bottom to top. Lines fill right to left. | [E-CF] |
+| `6` | Horizontal lines from bottom to top. Lines fill left to right. | [E-CF] |
+| `7` | Vertical lines from right to left. Lines fill bottom to top. | [E-CF] |
+
+| `{e}` | Description                                                                          | Source |
+|-------|--------------------------------------------------------------------------------------|--------|
+| `0`   | Undefined, implementation dependent.                                                 | [E-CF] |
+| `1`   | Update active line in presentation component to match active line in data component. | [E-CF] |
+| `2`   | Update active line in data component to match active line in presentation component. | [E-CF] |
 
 
 ### `J`: Erase In Page (ED)
@@ -158,6 +201,82 @@ Erases some or all of the current line. `{p}` defaults to `0`.
 | `2`   | Erase the entire line.                               | [E-CF] |
 
 
+### `m`: Select Graphic Rendition (SGR)
+
+Format: `CSI {p..} m`
+
+Sets one or more graphic rendition aspects for subsequent text. The default is `0` and the implementation determines what combinations are usable.
+
+| `{p}` | Description                                             | Source |
+|-------|---------------------------------------------------------|--------|
+| `0`   | Clear any effect, reset, restore to normal.             | [E-CF] |
+| `1`   | Bold intensity.                                         | [E-CF] |
+| `2`   | Faint intensity.                                        | [E-CF] |
+| `3`   | Italic.                                                 | [E-CF] |
+| `4`   | Underline.                                              | [E-CF] |
+| `5`   | Slow blinking (less than 150 per minute)                | [E-CF] |
+| `6`   | Rapid blinking (more than 150 per minute)               | [E-CF] |
+| `7`   | Inverse video / negative image.                         | [E-CF] |
+| `8`   | Concealed characters.                                   | [E-CF] |
+| `9`   | Crossed-out characters / strike-through.                | [E-CF] |
+| `10`  | Primary (default) font.                                 | [E-CF] |
+| `11`  | First alternative font.                                 | [E-CF] |
+| `12`  | Second alternative font.                                | [E-CF] |
+| `13`  | Third alternative font.                                 | [E-CF] |
+| `14`  | Fourth alternative font.                                | [E-CF] |
+| `15`  | Fifth alternative font.                                 | [E-CF] |
+| `16`  | Sixth alternative font.                                 | [E-CF] |
+| `17`  | Seventh alternative font.                               | [E-CF] |
+| `18`  | Eighth alternative font.                                | [E-CF] |
+| `19`  | Ninth alternative font.                                 | [E-CF] |
+| `20`  | Fraktur (Gothic).                                       | [E-CF] |
+| `21`  | Double underline.                                       | [E-CF] |
+| `22`  | Reset color and set normal intensity.                   | [E-CF] |
+| `23`  | Turn off italic and fraktur.                            | [E-CF] |
+| `24`  | Turn off underline (single or double).                  | [E-CF] |
+| `25`  | Turn off blinking text.                                 | [E-CF] |
+| `26`  | *Reserved for proportional spacing.*                    | [E-CF] |
+| `27`  | Turn off inverse video.                                 | [E-CF] |
+| `28`  | Turn off concealed characters.                          | [E-CF] |
+| `29`  | Turn off strike-through.                                | [E-CF] |
+| `30`  | Black foreground color.                                 | [E-CF] |
+| `31`  | Red foreground color.                                   | [E-CF] |
+| `32`  | Green foreground color.                                 | [E-CF] |
+| `33`  | Yellow foreground color.                                | [E-CF] |
+| `34`  | Blue foreground color.                                  | [E-CF] |
+| `35`  | Magenta foreground color.                               | [E-CF] |
+| `36`  | Cyan foreground color.                                  | [E-CF] |
+| `37`  | White foreground color.                                 | [E-CF] |
+| `38`  | *Reserved for future standardization.*                  | [E-CF] |
+| `39`  | Reset foreground color to default.                      | [E-CF] |
+| `40`  | Black background color.                                 | [E-CF] |
+| `41`  | Red background color.                                   | [E-CF] |
+| `42`  | Green background color.                                 | [E-CF] |
+| `43`  | Yellow background color.                                | [E-CF] |
+| `44`  | Blue background color.                                  | [E-CF] |
+| `45`  | Magenta background color.                               | [E-CF] |
+| `46`  | Cyan background color.                                  | [E-CF] |
+| `47`  | White background color.                                 | [E-CF] |
+| `48`  | *Reserved for future standardization.*                  | [E-CF] |
+| `49`  | Reset background color to default.                      | [E-CF] |
+| `50`  | *Reserved for canceling proportional spacing.*          | [E-CF] |
+| `51`  | Frame.                                                  | [E-CF] |
+| `52`  | Encircle.                                               | [E-CF] |
+| `53`  | Overlined.                                              | [E-CF] |
+| `54`  | Turn off frame, encircle.                               | [E-CF] |
+| `55`  | Turn off overline.                                      | [E-CF] |
+| `56`  | *Reserved for future standardization.*                  | [E-CF] |
+| `57`  | *Reserved for future standardization.*                  | [E-CF] |
+| `58`  | *Reserved for future standardization.*                  | [E-CF] |
+| `59`  | *Reserved for future standardization.*                  | [E-CF] |
+| `60`  | Ideogram underline or right side line.                  | [E-CF] |
+| `61`  | Ideogram double underline or double line on right side. | [E-CF] |
+| `62`  | Ideogram overline or left side line.                    | [E-CF] |
+| `63`  | Ideogram double overline or double line on left side.   | [E-CF] |
+| `64`  | Ideogram stress marking.                                | [E-CF] |
+| `65`  | Cancels the ideogram rendition aspects.                 | [E-CF] |
+
+
 Fonts and Glyphs
 ----------------
 
@@ -166,10 +285,18 @@ Fonts and Glyphs
 | `CSI {h} ; {w} SP B` | (GSM: Graphic Size Modification) Change the text height and width. *See below.*          | `100;100` | [E-CF] |
 | `CSI {p} SP C`       | (GSM: Graphic Size Selection) Change the size of the font. *See below.*                  | *none*    | [E-CF] |
 | `CSI {f} ; {m} SP D` | (FNT: Font Selection) Changes font number `{f}` to be font `{m}`. *See below.*           | `0;0`     | [E-CF] |
+| `CSI {l} ; {c} SP G` | (SPI: Spacing Increment) Changes line and character spacing. *See below.*                | *none*    | [E-CF] |
+| `CSI {p} SP I`       | (SSU: Select Size Unit) Pick a unit that affects several commands. *See below.*          | `0`       | [E-CF] |
+| `CSI {p} SP K`       | (SHS: Select Character Spacing) Sets spacing for subsequent text. *See below.*           | `0`       | [E-CF] |
+| `CSI {p} SP L`       | (SVS: Select Line Spacing) Sets line spacing. *See below.*                               | `0`       | [E-CF] |
 | `CSI {p} SP Z`       | (PEC: Presentation Expand Or Contract) Set character spacing. *See below.*               | `0`       | [E-CF] |
+| `CSI {p} SP [`       | (SSW: Set Space Width) Sets the character escapement. *See below.*                       | *none*    | [E-CF] |
 | `CSI {p..} SP ]`     | (SAPV: Select Alternative Presentation Variants) Display text differently. *See below.*  | `0`       | [E-CF] |
 | `CSI {p} SP \`       | (SACS: Set Additional Character Separation) Sets character separation. *See below.*      | `0`       | [E-CF] |
 | `CSI {n} SP _`       | (GCC: Graphic Character Combination) Overlays  characters as a single byte. *See below.* | `0`       | [E-CF] |
+| `CSI {p} SP f`       | (SRCS: Set Reduced Character Separation) Condenses text by removing space. *See below.*  | `0`       | [E-CF] |
+| `CSI {p} SP g`       | (SCS: Set Character Spacing) Sets spacing of following text. *See below.*                | *none*    | [E-CF] |
+| `CSI {p} SP h`       | (SLS: Set Line Spacing) Sets line spacing of following text. *See below.*                | *none*    | [E-CF] |
 | `CSI {p} H`          | (QUAD: Quad) Align and justify characters. *See below.*                                  | `0`       | [E-CF] |
 
 
@@ -180,7 +307,7 @@ Format: `CSI {h} ; {w} SP B`
 Modify the height and width of subsequent text of all primary and alternative fonts. The size stays in effect until the next Graphic Size Modification or Graphic Size Selection command. The height `{h}` and the width `{w}` are specified as percentages.
 
 
-### `SP B`: Graphic Size Selection (GSS)
+### `SP C`: Graphic Size Selection (GSS)
 
 Format: `CSI {p} SP C`
 
@@ -207,6 +334,69 @@ Select the primary or secondary font to use for displaying subsequent occurrence
 | `9`   | Ninth alternative font.   | [E-CF] |
 
 
+### `SP G`: Spacing Increment (SPI)
+
+Format: `CSI {l} ; {c} SP G`
+
+Sets the line spacing `{l}` and character spacing `{c}` for subsequent text. The line spacing remains in effect until the next Spacing Increment, Set Line Spacing, or Select Line Spacing. The character spacing remains in effect until the next Set Character Spacing or Select Character Spacing. There is no default value. The unit in which the parameter values are expressed are established by Select Size Unit.
+
+
+### `SP I`: Select Size Unit (SSU)
+
+Format: `CSI {p} SP I`
+
+Sets the unit that applies to the numeric parameters of certain control functions. The unit remains in effect until the next Select Size Unit command. The default value is `0`.
+
+| `{p}` | Description                                                      | Source |
+|-------|------------------------------------------------------------------|--------|
+| `0`   | Character: The dimensions are device-dependent.                  | [E-CF] |
+| `1`   | Millimeter.                                                      | [E-CF] |
+| `2`   | Computer Decipoint: 0.03528 mm (1/720 of 25.4 mm).               | [E-CF] |
+| `3`   | Decidot: 0.03759 mm (10/266 mm).                                 | [E-CF] |
+| `4`   | Mil: 0.0254 mm (1/1000 of 25.4 mm).                              | [E-CF] |
+| `5`   | Basic Measuring Unit (BMU): 0.02117 mm (1/1200 of 25.4 mm).      | [E-CF] |
+| `6`   | Micrometer: 0.001 mm.                                            | [E-CF] |
+| `7`   | Pixel: The smallest increment that can be specified in a device. | [E-CF] |
+| `8`   | Decipoint: 0.03514 mm (35/996 mm).                               | [E-CF] |
+
+
+### `SP K`: Select Character Spacing (SHS)
+
+Format: `CSI {p} SP K`
+
+Sets the character spacing that should be used for subsequent text. Remains in effect until the next Select Character Spacing, Set Character Spacing, or Spacing Increment. Defaults to `0`.
+
+| `{p}` | Description                | Source |
+|-------|----------------------------|--------|
+| `0`   | 10 characters per 25.4 mm. | [E-CF] |
+| `1`   | 12 characters per 25.4 mm. | [E-CF] |
+| `2`   | 15 characters per 25.4 mm. | [E-CF] |
+| `3`   | 6 characters per 25.4 mm.  | [E-CF] |
+| `4`   | 3 characters per 25.4 mm.  | [E-CF] |
+| `5`   | 9 characters per 50.8 mm.  | [E-CF] |
+| `6`   | 4 characters per 25.4 mm.  | [E-CF] |
+
+
+### `SP L`: Select Line Spacing (SVS)
+
+Format: `CSI {p} SP L`
+
+Sets line spacing for subsequent text. Remains in effect until Select Line Spacing, Set Line Spacing, or Spacing Increment. Defaults to `0`.
+
+| `{p}` | Description           | Source |
+|-------|-----------------------|--------|
+| `0`   | 6 lines per 25.4 mm.  | [E-CF] |
+| `1`   | 4 lines per 25.4 mm.  | [E-CF] |
+| `2`   | 3 lines per 25.4 mm.  | [E-CF] |
+| `3`   | 12 lines per 25.4 mm. | [E-CF] |
+| `4`   | 8 lines per 25.4 mm.  | [E-CF] |
+| `5`   | 6 lines per 30 mm.    | [E-CF] |
+| `6`   | 4 lines per 30 mm.    | [E-CF] |
+| `7`   | 3 lines per 30 mm.    | [E-CF] |
+| `8`   | 12 lines per 30 mm.   | [E-CF] |
+| `9`   | 2 lines per 25.4 mm.  | [E-CF] |
+
+
 ### `SP Z`: Presentation Expand or Contract (PEC)
 
 Format: `CSI {p} SP Z`
@@ -220,7 +410,14 @@ Sets the spacing and extent of the characters.
 | `2`   | Condensed. Multiplied by a factor not less than 0.5. | [E-CF] |
 
 
-### `SP ]`: Select Alternative Presentation Variants
+### `SP [`: Set Space Width (SSW)
+
+Format: `CSI {p} SP [`
+
+Sets the character escapement associated with subsequent space characters. Value remains in effect until the next Set Space Width, Carriage Return, Line Feed, Form Feed, or Next Line. `{p}` specifies the escapement in units specified by Select Size Unit. The default character escapement of space is specified by the most recent occurrence of Set Character Spacing, Select Character Spacing, Select Spacing Increment, or specified by the nominal width of the space character in the current font if that font has proportional spacing.
+
+
+### `SP ]`: Select Alternative Presentation Variants (SAPV)
 
 Format: `CSI {p..} SP ]`
 
@@ -271,6 +468,27 @@ Overlays two or more characters as a single character for display. `{p}` default
 | `0`   | Overlay two characters.                    | [E-CF] |
 | `1`   | Mark the beginning of overlaid characters. | [E-CF] |
 | `2`   | Mark the end of overlaid characters.       | [E-CF] |
+
+
+### `SP f`: Set Reduced Character Separation
+
+Format: `CSI {p} SP f`
+
+Sets reduced inter-character escapement for subsequent text and remains in effect until the next Set Reduced Character Separation, Set Additional Character Separation, Carriage Return, Line Feed, or Next Line. `{p}` specifies the number of units, which were assigned by Select Size Unit. The default is `0`.
+
+
+### `SP g`: Set Character Spacing (SCS)
+
+Format: `CSI {p} SP g`
+
+Sets the character spacing for subsequent text. The unit is determined by Select Size Unit. Spacing setting remains in effect until the next Set Character Spacing, Select Character Spacing, or Spacing Increment. There is no default value.
+
+
+### `SP h`: Set Line Spacing (SLS)
+
+Format: `CSI {p} SP h`
+
+Sets the line spacing for subsequent text. The unit is determined by Select Size Unit. Spacing setting remains in effect until the next Set Line Spacing, Select Line Spacing, or Spacing Increment. There is no default value.
 
 
 ### `H`: Quad (QUAD)
@@ -357,15 +575,41 @@ Format: `CSI {p} c`
 When `{p}` is `0`, this requests the Device Attributes from a device / terminal. The response should be sent as a Device Attributes sequence with a `{p}` value.
 
 
-Tab Stops
----------
+Tab Stops and Boundaries
+------------------------
 
-| Code          | Description                                                                       | Default | Source |
-|---------------|-----------------------------------------------------------------------------------|---------|--------|
-| `CSI {n} I`   | (CHT: Cursor Forward Tabulation) Move forward `{n}` tab stops.                    | `1`     | [E-CF] |
-| `CSI {p..} W` | (CTC: Cursor Tabulation Control) Set or clear one or more tab stops. *See below.* | `1`     | [E-CF] |
-| `CSI {n} Y`   | (CVT: Cursor Line Tabulation) Move forward `{n}` line tab stops.                  | `1`     | [E-CF] |
-| `CSI {n} Z`   | (CBT: Cursor Backward Tabulation) Move back `{n}` character tab stops.            | `1`     | [E-CF] |
+| Code           | Description                                                                       | Default | Source |
+|----------------|-----------------------------------------------------------------------------------|---------|--------|
+| `CSI {n} SP U` | (SLH: Set Line Home) Sets the starting position for lines. *See below.*           | *none*  | [E-CF] |
+| `CSI {n} SP V` | (SLH: Set Line Limit) Sets the ending position for lines. *See below.*            | *none*  | [E-CF] |
+| `CSI {n} SP ^` | (STAB: Selective Tabulation) Align text according to `{n}`th tab stop.            | *none*  | [E-CF] |
+| `CSI {n} SP i` | (SPH: Set Page Home) Sets the starting position for the page. *See below.*        | *none*  | [E-CF] |
+| `CSI {n} SP j` | (SPH: Set Page Limit) Sets the ending position for the active page.               | *none*  | [E-CF] |
+| `CSI {n} I`    | (CHT: Cursor Forward Tabulation) Move forward `{n}` tab stops.                    | `1`     | [E-CF] |
+| `CSI {p..} W`  | (CTC: Cursor Tabulation Control) Set or clear one or more tab stops. *See below.* | `1`     | [E-CF] |
+| `CSI {n} Y`    | (CVT: Cursor Line Tabulation) Move forward `{n}` line tab stops.                  | `1`     | [E-CF] |
+| `CSI {n} Z`    | (CBT: Cursor Backward Tabulation) Move back `{n}` character tab stops.            | `1`     | [E-CF] |
+
+
+### `SP U`: Set Line Home (SLH)
+
+Format: `CSI {n} SP U`
+
+Sets position `{n}` in the active line to be the home position for the active line and subsequent lines of text. Carriage Return, Delete Line, Insert Line, and Next Line will all use this as their home positions. This remains in effect until the next Set Line Home command.
+
+
+### `SP V`: Set Line Limit (SLL)
+
+Format: `CSI {n} SP V`
+
+Sets position `{n}` in the active line to be the end position for the active line and subsequent lines of text. Carriage Return and Next Line will use this position if their Set Implicit Movement Direction is set to `1`. This remains in effect until the next Set Line Limit command.
+
+
+### `SP i`: Set Page Home (SPH)
+
+Format: `CSI {n} SP i`
+
+Sets line position `{n}` to be the home position for the active page. Form Feed will advance the next page to this position.
 
 
 ### `W`: Cursor Tabulation Control (CTC)
@@ -406,6 +650,7 @@ Terminals were used for data entry. To make the forms behavior consistent and qu
 | `CSI {p..} F`        | (JFY: Justify) Mark where special character formatting starts. *See below.*  | `0`     | [E-CF] |
 | `CSI {p} N`          | (EF: Erase In Field) Erase some or all characters in a field. *See below.*   | `0`     | [E-CF] |
 | `CSI {p} O`          | (EA: Erase In Area) Remove some or all characters from an area. *See below.* | `0`     | [E-CF] |
+| `CSI {p} Q`          | (SEE: Select Editing Extent) Set editing extent. *See below.*                | `0`     | [E-CF] |
 | `CSI {p..} o`        | (DAQ: Define Area Qualification) Create a new area. *See below.*             | `0`     | [E-CF] |
 
 
@@ -463,6 +708,21 @@ Erases some or all of the characters from a qualified area, depending on the val
 | `2`   | Erase all character positions in the area.                   | [E-CF] |
 
 
+### `Q`: Select Editing Extent (SEE)
+
+Format: `CSI {p} Q`
+
+Establishes the editing extent for the subsequent character or line insertion or deletion. Different values of `{p}` affect the shifted part, typically in the presentation component. The default value of `{p}` is 0.
+
+| `{p}` | Description                                                                      | Source |
+|-------|----------------------------------------------------------------------------------|--------|
+| `0`   | Limit to the active page.                                                        | [E-CF] |
+| `1`   | Limit to the active line.                                                        | [E-CF] |
+| `2`   | Limit to the active field.                                                       | [E-CF] |
+| `3`   | Limit to the active qualified field.                                             | [E-CF] |
+| `4`   | Shifted part consists of the relevant part of the entire presentation component. | [E-CF] |
+
+
 ### `o`: Define Area Qualification (DAQ)
 
 Format: `CSI {p..} o`
@@ -488,16 +748,22 @@ Sets up a new qualified area. The area starts at the current cursor position and
 Alternative Output, Printing
 ----------------------------
 
-| Code           | Description                                                                    | Default | Source |
-|----------------|--------------------------------------------------------------------------------|---------|--------|
-| `CSI {p} SP J` | (PFS: Page Format Selection) Set the paper size for text. *See below.*         | `0`     | [E-CF] |
-| `CSI {n} SP P` | (PPA: Page Position Absolute) Sets active data position and page. *See below.* | `1`     | [E-CF] |
-| `CSI {n} SP Q` | (PPR: Page Position Forward) Sets active data position and page. *See below.*  | `1`     | [E-CF] |
-| `CSI {n} SP R` | (PPB: Page Position Backward) Sets active data position and page. *See below.* | `1`     | [E-CF] |
-| `CSI {n} SP e` | (SCO: Select Character Orientation) Rotate text. *See below.*                  | `0`     | [E-CF] |
-| `CSI {n} \`    | (PTX: Parallel Texts) Controls display of parallel texts. *See below.*         | `0`     | [E-CF] |
-| `CSI {p} i`    | (MC: Media Copy) Start a data transfer. *See below.*                           | `0`     | [E-CF] |
-| `CSI {p..} l`  | (RM: Reset Mode) Set receiving device mode. *See below.*                       | *none*  | [E-CF] |
+| Code                 | Description                                                                          | Default | Source |
+|----------------------|--------------------------------------------------------------------------------------|---------|--------|
+| `CSI {p} SP J`       | (PFS: Page Format Selection) Set the paper size for text. *See below.*               | `0`     | [E-CF] |
+| `CSI {p} SP P`       | (PPA: Page Position Absolute) Sets active data position and page. *See below.*       | `1`     | [E-CF] |
+| `CSI {p} SP Q`       | (PPR: Page Position Forward) Sets active data position and page. *See below.*        | `1`     | [E-CF] |
+| `CSI {p} SP R`       | (PPB: Page Position Backward) Sets active data position and page. *See below.*       | `1`     | [E-CF] |
+| `CSI {p} SP X`       | (SPQR: Set Print Quality And Rapidity) Controls printer speed, quality. *See below.* | `0`     | [E-CF] |
+| `CSI {l} ; {s} SP Y` | (SEF: Sheet Eject And Feed) Ejects a sheet and loads a new one. *See below.*         | `0;0`   | [E-CF] |
+| `CSI {p} SP ]`       | (SDS: Start Directed String) Mark how a string is displayed. *See below.*            | `0`     | [E-CF] |
+| `CSI {p} SP e`       | (SCO: Select Character Orientation) Rotate text. *See below.*                        | `0`     | [E-CF] |
+| `CSI {p} ; {e} SP k` | (SCP: Select Character Path) Reverses flow of text. *See below.*                     | *none*  | [E-CF] |
+| `CSI {p} [`          | (SRS: Start Reversed String) Marks the beginning of reversed text. *See below.*      | `0`     | [E-CF] |
+| `CSI {n} \`          | (PTX: Parallel Texts) Controls display of parallel texts. *See below.*               | `0`     | [E-CF] |
+| `CSI {p} h`          | (SM: Set Mode) Set receiving device mode. *See below.*                               | *none*  | [E-CF] |
+| `CSI {p} i`          | (MC: Media Copy) Start a data transfer. *See below.*                                 | `0`     | [E-CF] |
+| `CSI {p..} l`        | (RM: Reset Mode) Set receiving device mode. *See below.*                             | *none*  | [E-CF] |
 
 
 ### `SP J`: Page Format Selection (PFS)
@@ -547,6 +813,57 @@ Format: `CSI {p} SP R`
 Causes the active data position to be moved in the data component to the corresponding character position on the `{n}`th preceding page.
 
 
+### `SP X`: Set Print Quality And Rapidity (SPQR)
+
+Format: `CSI {p} SP X`
+
+Sets the speed and quality of the printer, which is inversely proportional. Faster means less quality. Defaults to `0`.
+
+| `{p}` | Description                                          | Source |
+|-------|------------------------------------------------------|--------|
+| `0`   | Highest available print quality; lowest print speed. | [E-CF] |
+| `1`   | Medium print quality; medium print speed.            | [E-CF] |
+| `2`   | Lowest (draft) print quality; highest print speed.   | [E-CF] |
+
+
+### `SP Y`: Sheet Eject and Feed (SEF)
+
+Format: `CSI {l} ; {s} SP Y`
+
+Ejects a sheet of paper from the printing device. Loads another sheet as specified by `{l}`. Puts the ejected sheet into the stacker designated by `{s}`. Defaults to `0;0`.
+
+| `{p}` | Description              | Source |
+|-------|--------------------------|--------|
+| `0`   | Do not load a new sheet. | [E-CF] |
+| `1`   | Load sheet from bin 1.   | [E-CF] |
+| `2`   | Load sheet from bin 2.   | [E-CF] |
+| ...   | ...                      | ...    |
+| *n*   | Load sheet from bin *n*. | [E-CF] |
+
+| `{s}` | Description             | Source |
+|-------|-------------------------|--------|
+| `0`   | No stacker specified.   | [E-CF] |
+| `1`   | Eject into stacker 1.   | [E-CF] |
+| `2`   | Eject into stacker 2.   | [E-CF] |
+| ...   | ...                     | ...    |
+| *n*   | Eject into stacker *n*. | [E-CF] |
+
+
+### `SP ]`: Start Directed String (SDS)
+
+Format: `CSI {p} SP ]`
+
+Mark the beginning and end of a string and designate if the string should be displayed forwards or backwards. Defaults to `0`.
+
+| `{p}` | Description | Source |
+|---|---|---|
+| `0` | End of a directed string. Restore the previous direction. | [E-CF] |
+| `1` | Start of a directed string. Set direction as left to right. | [E-CF] |
+| `2` | Start of a directed string. Set direction as right to left. | [E-CF] |
+
+Far more notes are explained in [E-CF], section 8.3.114.
+
+
 ### `SP e`: Select Character Orientation (SCO)
 
 Format: `CSI {p} SP e`
@@ -565,6 +882,38 @@ Changes the amount of rotation for the following characters. Default value of `{
 | `7`   | 315 degrees. | [E-CF] |
 
 
+### `SP k`: Select Character Path (SCP)
+
+Format: `CSI {p} ; {e} SP k`
+
+`{p}` determines the flow of characters when layout is left to right or top to bottom. `{e}` describes the effect. When `{e}` is non-zero, both the presentation and data components move their active position to the first character positions. There is no default value.
+
+| `{p}` | Description                              | Source |
+|-------|------------------------------------------|--------|
+| `1`   | Normal (left to right / top to bottom)   | [E-CF] |
+| `2`   | Reversed (right to left / bottom to top) | [E-CF] |
+
+| `{e}` | Description                                                                          | Source |
+|-------|--------------------------------------------------------------------------------------|--------|
+| `0`   | Undefined, implementation dependent.                                                 | [E-CF] |
+| `1`   | Update active line in presentation component to match active line in data component. | [E-CF] |
+| `2`   | Update active line in data component to match active line in presentation component. | [E-CF] |
+
+
+### `[`: Start Reversed String (SRS)
+
+Format `CSI {p} [`
+
+Indicates the start and the end of a string in a direction that is opposite to what's currently established. The string follows the preceding text and character progression is not affected. Nested strings are allowed, including Start Directed String. Defaults to `0`.
+
+| `{p}` | Description                                                   | Source |
+|-------|---------------------------------------------------------------|--------|
+| `0`   | End of a reversed string. Reestablish the previous direction. | [E-CF] |
+| `1`   | Beginning of a reversed string. Reverse the direction.        | [E-CF] |
+
+Many more notes are available at [E-CF], section 8.3.137.
+
+
 ### `\`: Parallel Texts (PTX)
 
 Format: `CSI {n} \`
@@ -581,6 +930,38 @@ Delimits strings of graphic characters that are communicated one after another i
 | `5`   | End of a string of supplementary phonetic annotations.               | [E-CF] |
 
 There's significantly more detail in [E-CF], section 8.3.99 regarding this code.
+
+
+### `h`: Set Mode (SM)
+
+Format: `CSI {p} h`
+
+Sets the mode of the receiving device to value indicated by `{p}`. Does not have a default value.
+
+| `{p}` | Description                           | Source |
+|-------|---------------------------------------|--------|
+| `1`   | Guarded Area Transfer Mode (GATM).    | [E-CF] |
+| `2`   | Keyboard Action Mode (KAM).           | [E-CF] |
+| `3`   | Control Representation Mode (CRM).    | [E-CF] |
+| `4`   | Insertion Replacement Mode (IRM).     | [E-CF] |
+| `5`   | Status Report Transfer Mode (SRTM).   | [E-CF] |
+| `6`   | Erasure Mode (ERM).                   | [E-CF] |
+| `7`   | Line Editing Mode (VEM).              | [E-CF] |
+| `8`   | Bidirectional Support Mode (BDSM).    | [E-CF] |
+| `9`   | Device Component Select Mode (DCSM).  | [E-CF] |
+| `10`  | Character Editing Mode (HEM).         | [E-CF] |
+| `11`  | Positioning Unit Mode (PUM).          | [E-CF] |
+| `12`  | Send/receive Mode (SRM).              | [E-CF] |
+| `13`  | Format Effector Action Mode (FEAM).   | [E-CF] |
+| `14`  | Format Effector Transfer Mode (FETM). | [E-CF] |
+| `15`  | Multiple Area Transfer Mode (MATM).   | [E-CF] |
+| `16`  | Transfer Termination Mode (TTM).      | [E-CF] |
+| `17`  | Selected Area Transfer Mode (SATM).   | [E-CF] |
+| `18`  | Tabulation Stop Mode (TSM).           | [E-CF] |
+| `19`  | *Shall not be used.*                  | [E-CF] |
+| `20`  | *Shall not be used.*                  | [E-CF] |
+| `21`  | Graphic Rendition Combination (GRCM). | [E-CF] |
+| `22`  | Zero Default Mode (ZDM).              | [E-CF] |
 
 
 ### `i`: Media Copy (MC)
@@ -648,7 +1029,7 @@ Sources
 [W-CC]: https://en.wikipedia.org/wiki/C0_and_C1_control_codes
 [W-GA]: https://en.wikipedia.org/wiki/Grave_accent
 
-CSI 8.3.110 67
+CSI 8.3.149 94
 OSC
 
 ECMA codes
@@ -674,5 +1055,6 @@ https://en.wikipedia.org/wiki/ANSI_escape_code
 http://www.shaels.net/index.php/propterm/documents/14-ansi-protocol
 examples of Mosh
 https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+readkey bpm library
 
 * Wikipedia's [ANSI Escape Code](https://en.wikipedia.org/wiki/ANSI_escape_code)
