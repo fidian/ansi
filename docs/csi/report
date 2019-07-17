@@ -1,0 +1,63 @@
+Category: REPORT
+Format: `CSI {n} k`
+8-Bit Hex: `9b {n} 6b`
+7-Bit Hex: `1b {n} 6b`
+Default: `{n}` = `1`
+Source: E-CF
+Title: (VPB) Line Position Backward
+Description: Move the cursor up `{n}` lines.
+
+
+Reporting and Queries
+---------------------
+
+| Code              | Description                                                                             | Default | Source |
+|-------------------|-----------------------------------------------------------------------------------------|---------|--------|
+| `CSI {p} SP M`    | (IGS: Identify Graphic Subrepertoire) Identifies graphic characters. *See below.*       | *none*  | [E-CF] |
+| `CSI {p} SP O`    | (IDCS: Identify Device Control String) Specify type of future commands. *See below.*    | *none*  | [E-CF] |
+| `CSI {p} N`       | (DSR: Device Status Report) Request or report the status of a device. *See below.*      | `0`     | [E-CF] |
+| `CSI {l} ; {c} R` | (CPR: Active Position Report) Terminal reporting cursor is at line `{l}`, column `{c}`. | `1;1`   | [E-CF] |
+| `CSI {p} c`       | (DA: Device Attributes) Request or send device type identification codes. *See below.*  | `0`     | [E-CF] |
+
+
+### `SP M`: Identify Graphic Subrepertoire (IGS)
+
+Format: `CSI {p} SP M`
+
+Indicates that a repertoire of the graphic characters of ISO/IEC 10367 is used with the subsequent text. The parameter value identifies a graphic character repertoire registered in accordance with ISO/IEC 7350.
+
+
+### `SP O`: Identify Device Control String (IDCS)
+
+Format: `CSI {p} SP O`
+
+Identifies the purpose and format of subsequent Device Control String sequences. The purpose and format remain in effect until the next Identify Device Control String.
+
+| `{p}` | Description                                                       | Source |
+|-------|-------------------------------------------------------------------|--------|
+| `0`   | Used for the Diagnostic state of the Status Report Transfer Mode. | [E-CF] |
+| `1`   | For Dynamically Redefinable Character Sets according to ECMA-15.  | [E-CF] |
+
+
+### `N`: Device Status Report (DSR)
+
+Format: `CSI {p} N`
+
+When `{p}` is `5`, this requests the Device Status Report from a device / terminal. The response is sent as a Device Status Report sequence with a `{p}` value (and `0` could be omitted). Messages `0` through `4` can be sent unsolicited.
+
+| `{p}` | Description                                                        | Source |
+|-------|--------------------------------------------------------------------|--------|
+| `0`   | Ready, no malfunction detected.                                    | [E-CF] |
+| `1`   | Busy, another Device Status Report must be requested later.        | [E-CF] |
+| `2`   | Busy, another Device Status Report will be sent later.             | [E-CF] |
+| `3`   | Some malfunction detected, another report must be requested later. | [E-CF] |
+| `4`   | Some malfunction detected, another report will be sent later.      | [E-CF] |
+| `5`   | A Device Status Report is requested.                               | [E-CF] |
+| `6`   | Request the cursor location in an Active Position Report format.   | [E-CF] |
+
+
+### `c`: Device Attributes (DA)
+
+Format: `CSI {p} c`
+
+When `{p}` is `0`, this requests the Device Attributes from a device / terminal. The response should be sent as a Device Attributes sequence with a `{p}` value.

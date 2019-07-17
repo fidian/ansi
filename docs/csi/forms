@@ -1,0 +1,114 @@
+Category: FORMS
+Format: `CSI {n} k`
+8-Bit Hex: `9b {n} 6b`
+7-Bit Hex: `1b {n} 6b`
+Default: `{n}` = `1`
+Source: E-CF
+Title: (VPB) Line Position Backward
+Description: Move the cursor up `{n}` lines.
+
+
+Forms, Qualified Areas, and Fields
+----------------------------------
+
+Terminals were used for data entry. To make the forms behavior consistent and quick for the server to update, special codes were created. These are mostly unsupported now.
+
+| Code                 | Description                                                                  | Default | Source |
+|----------------------|------------------------------------------------------------------------------|---------|--------|
+| `CSI {l} ; {c} SP T` | (DTA: Dimension Text Area) Create a text area. *See below.*                  | *none*  | [E-CF] |
+| `CSI {p..} F`        | (JFY: Justify) Mark where special character formatting starts. *See below.*  | `0`     | [E-CF] |
+| `CSI {p} N`          | (EF: Erase In Field) Erase some or all characters in a field. *See below.*   | `0`     | [E-CF] |
+| `CSI {p} O`          | (EA: Erase In Area) Remove some or all characters from an area. *See below.* | `0`     | [E-CF] |
+| `CSI {p} Q`          | (SEE: Select Editing Extent) Set editing extent. *See below.*                | `0`     | [E-CF] |
+| `CSI {p..} o`        | (DAQ: Define Area Qualification) Create a new area. *See below.*             | `0`     | [E-CF] |
+
+
+### `SP T`: Dimension Text Area
+
+Format: `CSI {l} ; {c} SP T`
+
+Creates a text area for subsequent pages. `{l}` is the number of lines, and `{c}` is the number of columns.
+
+There is no default value.
+
+
+### `F`: Justify (JFY)
+
+Format: `CSI {p..} F`
+
+Marks the beginning of a string of characters that should be formatted according to the values of `{p}`. This remains in effect until the next Justify command.
+
+| `{p}` | Description                                               | Source |
+|-------|-----------------------------------------------------------|--------|
+| `0`   | No justification, end of justification of preceding text. | [E-CF] |
+| `1`   | Word fill.                                                | [E-CF] |
+| `2`   | Word space.                                               | [E-CF] |
+| `3`   | Letter space.                                             | [E-CF] |
+| `4`   | Hyphenation.                                              | [E-CF] |
+| `5`   | Left aligned.                                             | [E-CF] |
+| `6`   | Centered.                                                 | [E-CF] |
+| `7`   | Right aligned.                                            | [E-CF] |
+| `8`   | Italian hypenation.                                       | [E-CF] |
+
+
+### `N`: Erase in Field (EF)
+
+Format: `CSI {o} N`
+
+Erases some or all of the characters from a field, depending on the value of `{p}`. It defaults to `0` when `{p}` is not specified.
+
+| `{p}` | Description                                                   | Source |
+|-------|---------------------------------------------------------------|--------|
+| `0`   | Erase from cursor to end of field.                            | [E-CF] |
+| `1`   | Erase from beginning of field up to and including the cursor. | [E-CF] |
+| `2`   | Erase all character positions in the field.                   | [E-CF] |
+
+
+### `O`: Erase in Area (EA)
+
+Format: `CSI {o} O`
+
+Erases some or all of the characters from a qualified area, depending on the value of `{p}`. It defaults to `0` when `{p}` is not specified.
+
+| `{p}` | Description                                                  | Source |
+|-------|--------------------------------------------------------------|--------|
+| `0`   | Erase from cursor to end of area.                            | [E-CF] |
+| `1`   | Erase from beginning of area up to and including the cursor. | [E-CF] |
+| `2`   | Erase all character positions in the area.                   | [E-CF] |
+
+
+### `Q`: Select Editing Extent (SEE)
+
+Format: `CSI {p} Q`
+
+Establishes the editing extent for the subsequent character or line insertion or deletion. Different values of `{p}` affect the shifted part, typically in the presentation component. The default value of `{p}` is 0.
+
+| `{p}` | Description                                                                      | Source |
+|-------|----------------------------------------------------------------------------------|--------|
+| `0`   | Limit to the active page.                                                        | [E-CF] |
+| `1`   | Limit to the active line.                                                        | [E-CF] |
+| `2`   | Limit to the active field.                                                       | [E-CF] |
+| `3`   | Limit to the active qualified field.                                             | [E-CF] |
+| `4`   | Shifted part consists of the relevant part of the entire presentation component. | [E-CF] |
+
+
+### `o`: Define Area Qualification (DAQ)
+
+Format: `CSI {p..} o`
+
+Sets up a new qualified area. The area starts at the current cursor position and ends the character before the next qualified area. `{p}` can be one or more values.
+
+| `{p}` | Description                            | Source |
+|-------|----------------------------------------|--------|
+| `0`   | Unprotected and unguarded.             | [E-CF] |
+| `1`   | Protected and guarded.                 | [E-CF] |
+| `2`   | Graphic character input.               | [E-CF] |
+| `3`   | Numeric input.                         | [E-CF] |
+| `4`   | Alphabetic input.                      | [E-CF] |
+| `5`   | Input is right-aligned.                | [E-CF] |
+| `6`   | Fill with zeros.                       | [E-CF] |
+| `7`   | Set a character tab stop here.         | [E-CF] |
+| `8`   | Protected and guarded.                 | [E-CF] |
+| `9`   | Fill with spaces.                      | [E-CF] |
+| `10`  | Input is left-aligned.                 | [E-CF] |
+| `11`  | Order of input characters is reversed. | [E-CF] |

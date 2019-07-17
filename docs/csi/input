@@ -1,0 +1,18 @@
+Category: INPUT
+Format: `CSI {n} k`
+8-Bit Hex: `9b {n} 6b`
+7-Bit Hex: `1b {n} 6b`
+Default: `{n}` = `1`
+Source: E-CF
+Title: (VPB) Line Position Backward
+Description: Move the cursor up `{n}` lines.
+
+
+Input
+-----
+
+The terminal gets to send escape sequences as well.
+
+| Code           | Description                                                         | Default | Source |
+|----------------|---------------------------------------------------------------------|---------|--------|
+| `CSI {p} SP W` | (FNK: Function Key) `{p}` indicates which function key was pressed. | *none*  | [E-CF] |
