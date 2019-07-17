@@ -37,20 +37,20 @@ The `CSI` translates into `ESC [` according to the table below, and `ESC` means 
 
 This table lists the necessary prefixes and character codes for the rest of the escape sequences.
 
-| Code  | Description                 | 7-bit               | 8-bit               | Source        |
-|-------|-----------------------------|---------------------|---------------------|---------------|
-| LF    | Line Feed                   | **012, 10, 0x0a**   | **012, 10, 0x0a**   | [E-CF] [W-CC] |
-| VT    | Vertical Tabulation         | **013, 11, 0x0b**   | **013, 11, 0x0b**   | [E-CF] [W-CC] |
-| FF    | Form Feed                   | **014, 12, 0x0c**   | **014, 12, 0x0c**   | [E-CF] [W-CC] |
-| CR    | Carriage Return             | **015, 13, 0x0d**   | **015, 13, 0x0d**   | [E-CF] [W-CC] |
-| SP    | Space                       | **024, 20, 0x14**   | **024, 20, 0x14**   | [E-CS] [W-CC] |
-| ESC   | Escape                      | **033, 27, 0x1b**   | **033, 27, 0x1b**   | [E-CS] [W-CC] |
-| GRAVE | Grave Accent                | **0140, 96, 0x60**  | **0140, 96, 0x60**  | [E-CS] [W-GA] |
-| NEL   | Next Line                   | **0205, 133, 0x85** | **0205, 133, 0x85** | [E-CF] [W-CC] |
-| RI    | Reverse Line Feed           | **0215, 141, 0x8d** | **0215, 141, 0x8d** | [E-CF] [W-CC] |
-| CSI   | Control Sequence Introducer | `ESC [`             | **0233, 155, 0x9b** | [E-CF] [E-CS] |
-| ST    | String Terminator           | `ESC \`             | **0234, 156, 0x9c** | [E-CF] [E-CS] |
-| OSC   | Operating System Command    | `ESC ]`             | **0235, 157, 0x9d** | [E-CF] [E-CS] |
+| Code  | Description                           | 7-bit               | 8-bit               | Source        |
+|-------|---------------------------------------|---------------------|---------------------|---------------|
+| LF    | Line Feed                             | **012, 10, 0x0a**   | **012, 10, 0x0a**   | [E-CF] [W-CC] |
+| VT    | Vertical Tabulation / Line Tabulation | **013, 11, 0x0b**   | **013, 11, 0x0b**   | [E-CF] [W-CC] |
+| FF    | Form Feed                             | **014, 12, 0x0c**   | **014, 12, 0x0c**   | [E-CF] [W-CC] |
+| CR    | Carriage Return                       | **015, 13, 0x0d**   | **015, 13, 0x0d**   | [E-CF] [W-CC] |
+| SP    | Space                                 | **024, 20, 0x14**   | **024, 20, 0x14**   | [E-CS] [W-CC] |
+| ESC   | Escape                                | **033, 27, 0x1b**   | **033, 27, 0x1b**   | [E-CS] [W-CC] |
+| GRAVE | Grave Accent                          | **0140, 96, 0x60**  | **0140, 96, 0x60**  | [E-CS] [W-GA] |
+| NEL   | Next Line                             | **0205, 133, 0x85** | **0205, 133, 0x85** | [E-CF] [W-CC] |
+| RI    | Reverse Line Feed                     | **0215, 141, 0x8d** | **0215, 141, 0x8d** | [E-CF] [W-CC] |
+| CSI   | Control Sequence Introducer           | `ESC [`             | **0233, 155, 0x9b** | [E-CF] [E-CS] |
+| ST    | String Terminator                     | `ESC \`             | **0234, 156, 0x9c** | [E-CF] [E-CS] |
+| OSC   | Operating System Command              | `ESC ]`             | **0235, 157, 0x9d** | [E-CF] [E-CS] |
 
 Normally `GRAVE` would not need to be called out, but it's a special character in Markdown. Because this document uses Markdown, it can't easily be represented in the document. It's also known as a backwards apostrophe or a backtick.
 
@@ -112,8 +112,11 @@ Cursor Movement
 | `CSI {p} ^`       | (SIMD: Select Implicit Movement Direction) Sets cursor movement direction. *See below.*        | `0`     | [E-CF] |
 | `CSI {c} GRAVE`   | (HPA: Character Position Absolute) Move to column `{c}` in the active line.                    | `1`     | [E-CF] |
 | `CSI {n} a`       | (HPR: Character Position Forward) Move the cursor forwards `{n}` characters.                   | `1`     | [E-CF] |
+| `CSI {n} d`       | (VPA: Line Position Absolute) Move straight up or down to line `{n}`.                          | `1`     | [E-CF] |
+| `CSI {n} e`       | (VPR: Line Position Forward) Move down `{n}` lines.                                            | `1`     | [E-CF] |
 | `CSI {l} ; {c} f` | (HVP: Character Line and Position) Move the cursor down `{l}` lines and forward `{c}` columns. | `1;1`   | [E-CF] |
 | `CSI {n} j`       | (HPB: Character Position Backward) Move the cursor backwards `{n}` characters.                 | `1`     | [E-CF] |
+| `CSI {n} k`       | (VPB: Line Position Backward) Move up `{n}` lines.                                             | `1`     | [E-CF] |
 
 
 ### `^`: Set Implicit Movement Direction (SIMD)
@@ -285,6 +288,7 @@ Fonts and Glyphs
 | `CSI {h} ; {w} SP B` | (GSM: Graphic Size Modification) Change the text height and width. *See below.*          | `100;100` | [E-CF] |
 | `CSI {p} SP C`       | (GSM: Graphic Size Selection) Change the size of the font. *See below.*                  | *none*    | [E-CF] |
 | `CSI {f} ; {m} SP D` | (FNT: Font Selection) Changes font number `{f}` to be font `{m}`. *See below.*           | `0;0`     | [E-CF] |
+| `CSI {p} SP E`       | (TSS: Thin Space Specification) Sets width of a thin space. *See below.*                 | *none*    | [E-CF] |
 | `CSI {l} ; {c} SP G` | (SPI: Spacing Increment) Changes line and character spacing. *See below.*                | *none*    | [E-CF] |
 | `CSI {p} SP I`       | (SSU: Select Size Unit) Pick a unit that affects several commands. *See below.*          | `0`       | [E-CF] |
 | `CSI {p} SP K`       | (SHS: Select Character Spacing) Sets spacing for subsequent text. *See below.*           | `0`       | [E-CF] |
@@ -332,6 +336,13 @@ Select the primary or secondary font to use for displaying subsequent occurrence
 | `7`   | Seventh alternative font. | [E-CF] |
 | `8`   | Eighth alternative font.  | [E-CF] |
 | `9`   | Ninth alternative font.   | [E-CF] |
+
+
+### `SP E`: Thin Space Specification (TSS)
+
+Format: `CSI {p} SP E`
+
+Sets the width of a thin space for subsequent text. Uses the unit specified by Select Size Unit. No default value for `{p}`.
 
 
 ### `SP G`: Spacing Increment (SPI)
@@ -578,17 +589,23 @@ When `{p}` is `0`, this requests the Device Attributes from a device / terminal.
 Tab Stops and Boundaries
 ------------------------
 
-| Code           | Description                                                                       | Default | Source |
-|----------------|-----------------------------------------------------------------------------------|---------|--------|
-| `CSI {n} SP U` | (SLH: Set Line Home) Sets the starting position for lines. *See below.*           | *none*  | [E-CF] |
-| `CSI {n} SP V` | (SLH: Set Line Limit) Sets the ending position for lines. *See below.*            | *none*  | [E-CF] |
-| `CSI {n} SP ^` | (STAB: Selective Tabulation) Align text according to `{n}`th tab stop.            | *none*  | [E-CF] |
-| `CSI {n} SP i` | (SPH: Set Page Home) Sets the starting position for the page. *See below.*        | *none*  | [E-CF] |
-| `CSI {n} SP j` | (SPH: Set Page Limit) Sets the ending position for the active page.               | *none*  | [E-CF] |
-| `CSI {n} I`    | (CHT: Cursor Forward Tabulation) Move forward `{n}` tab stops.                    | `1`     | [E-CF] |
-| `CSI {p..} W`  | (CTC: Cursor Tabulation Control) Set or clear one or more tab stops. *See below.* | `1`     | [E-CF] |
-| `CSI {n} Y`    | (CVT: Cursor Line Tabulation) Move forward `{n}` line tab stops.                  | `1`     | [E-CF] |
-| `CSI {n} Z`    | (CBT: Cursor Backward Tabulation) Move back `{n}` character tab stops.            | `1`     | [E-CF] |
+| Code                 | Description                                                                          | Default     | Source |
+|----------------------|--------------------------------------------------------------------------------------|-------------|--------|
+| `CSI {n} SP U`       | (SLH: Set Line Home) Sets the starting position for lines. *See below.*              | *none*      | [E-CF] |
+| `CSI {n} SP V`       | (SLH: Set Line Limit) Sets the ending position for lines. *See below.*               | *none*      | [E-CF] |
+| `CSI {n} SP ^`       | (STAB: Selective Tabulation) Align text according to `{n}`th tab stop.               | *none*      | [E-CF] |
+| `CSI {n} SP GRAVE`   | (TALE: Tabulation Aligned Trailing Edge) Set right-aligned tab stop at column `{n}`. | *none*      | [E-CF] |
+| `CSI {n} SP a`       | (TALE: Tabulation Aligned Leading Edge) Set left-aligned tab stop at column `{n}`.   | *none*      | [E-CF] |
+| `CSI {n} SP b`       | (TAC: Tabulation Aligned Centered) Set centered tab stop at `{n}`th column.          | *none*      | [E-CF] |
+| `CSI {n} ; {c} SP c` | (TCC: Tabulation Centered On Character) Center text on a character. *See below.*     | *none*`;32` | [E-CF] |
+| `CSI {n} SP d`       | (TSR: Tabulation Stop Remove) Removes tab stop at column `{n}`.                      | *none*      | [E-CF] |
+| `CSI {n} SP i`       | (SPH: Set Page Home) Sets the starting position for the page. *See below.*           | *none*      | [E-CF] |
+| `CSI {n} SP j`       | (SPH: Set Page Limit) Sets the ending position for the active page.                  | *none*      | [E-CF] |
+| `CSI {n} I`          | (CHT: Cursor Forward Tabulation) Move forward `{n}` tab stops.                       | `1`         | [E-CF] |
+| `CSI {p..} W`        | (CTC: Cursor Tabulation Control) Set or clear one or more tab stops. *See below.*    | `1`         | [E-CF] |
+| `CSI {n} Y`          | (CVT: Cursor Line Tabulation) Move forward `{n}` line tab stops.                     | `1`         | [E-CF] |
+| `CSI {n} Z`          | (CBT: Cursor Backward Tabulation) Move back `{n}` character tab stops.               | `1`         | [E-CF] |
+| `CSI {p} g`          | (TBC: Tabulation Clear) Clear one or more tab stops. *See below.*                    | `0`         | [E-CF] |
 
 
 ### `SP U`: Set Line Home (SLH)
@@ -603,6 +620,15 @@ Sets position `{n}` in the active line to be the home position for the active li
 Format: `CSI {n} SP V`
 
 Sets position `{n}` in the active line to be the end position for the active line and subsequent lines of text. Carriage Return and Next Line will use this position if their Set Implicit Movement Direction is set to `1`. This remains in effect until the next Set Line Limit command.
+
+
+### `SP c`: Tabulation Centered On Character (TCC)
+
+Format: `CSI {n} ; {c} SP c`
+
+Sets a tab stop at character position `{n}` in the active line and of lines of subsequent text. Replaces any tab stop at the same location, but does not affect other tab stops. Strings are centered on the tab stop on the first occurrence of the character within the string. If the character does not appear, the text will be left aligned to the tab stop.
+
+There is no default value for `{n}`. `{c}` defaults to `32`, which is a space. Allowed values for `{c}` are `32`-`127` and also includes `160`-`255` for 8-bit codes.
 
 
 ### `SP i`: Set Page Home (SPH)
@@ -637,6 +663,22 @@ Examples:
 | `CSI W`     | Set a line tab stop on the current line.                                       | [E-CF] |
 | `CSI 1 W`   | Same as default.                                                               | [E-CF] |
 | `CSI 6 ; 1` | Clear all line tab stops and add a character tab stop at the current position. | [E-CF] |
+
+
+### `g`: Tabulation Clear (TBC)
+
+Format: `CSI {p} g`
+
+Clears one or more tab stops based on the value of `{p}`, which defaults to `0`.
+
+| `{p}` | Description                                                                        | Source |
+|-------|------------------------------------------------------------------------------------|--------|
+| `0`   | Clear the character tab stop at active position. Affected by Tabulation Stop Mode. | [E-CF] |
+| `1`   | Clear the line tab stop at the active line.                                        | [E-CF] |
+| `2`   | Clear all tab stops in the active line.  Affected by Tabulation Stop Mode.         | [E-CF] |
+| `3`   | Clear all character tabulation stops.                                              | [E-CF] |
+| `4`   | Clear all line tabulation stops.                                                   | [E-CF] |
+| `5`   | Clear all tabulation stops.                                                        | [E-CF] |
 
 
 Forms, Qualified Areas, and Fields
@@ -1029,7 +1071,6 @@ Sources
 [W-CC]: https://en.wikipedia.org/wiki/C0_and_C1_control_codes
 [W-GA]: https://en.wikipedia.org/wiki/Grave_accent
 
-CSI 8.3.149 94
 OSC
 
 ECMA codes
