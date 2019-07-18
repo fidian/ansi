@@ -1,0 +1,24 @@
+General:
+    only one of each header
+
+csi/*
+    Category: uppercase, matches a lowercased category filename, A-Z and hyphens
+    Format: markdown's code
+    8-Bit Hex: code + lowercase
+    7-bit Hex: code + lowercase
+    Default: exists
+    Source: uppercase, matches a lowercased source filename, A-Z and hyphens
+    Title: Format: (x) Longer title
+    Description: exists
+
+    optional body
+
+categories/*
+    Name: exists
+
+    optional body
+
+sources/*
+    Short: uppercase
+    Name: exists
+    Url: exists, valid URL?
