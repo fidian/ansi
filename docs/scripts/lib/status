@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+status() {
+    echo -n "$file"
+}
+
+statusClear() {
+    echo -ne $'\033[2K\033[G'
+}
+
+error() {
+    statusClear
+    echo "$1"
+}
+
