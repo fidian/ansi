@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+
+# shellcheck disable=SC1091
+. bpm
+bpm::include assign
+bpm::include string
+
+# Read a file into an associative array, $LOADFILE. The headers are keyed by
+# their name, preserving their capitalization. The body is read under the key
+# "".
+#
+# $1 - destination variable name
+# $2 - variable name to declare
+# $3 - filename
+#
+# Returns nothing.
+loadFile() {
+    local contents file fileStr lastHeader readingHeader
+
+    declare -A file
+    file=()
+    readingHeader=true
+    lastHeader=
+    contents=$(cat "$3")
+
+    while $readingHeader; do
+        line=${contents%%$'\n'*}
+        contents=${contents:${#line}+1}
+
+        if [[ "$line" =~ ^[\ \\t] ]]; then
+            # Continuation
+            if [[ -z "$lastHeader" ]]; then
+                echo "First line does not describe a header." >&2
+                exit 1
+            fi
+
+            string::trim line "$line"
+            file[$lastHeader]="${file[$lastHeader]}"$'\n'"$line"
+        else
+            string::trim line "$line"
+
+            if [[ -z "$line" ]]; then
+                readingHeader=false
+            else
+                lastHeader=${line%%:*}
+                line=${line:${#lastHeader}+1}
+                string::trim lastHeader "$lastHeader"
+                string::trim line "$line"
+                file[$lastHeader]=$line
+            fi
+        fi
+    done
+
+    string::trim contents "$contents"
+
+    if [[ -n "$contents" ]]; then
+       file[0]=$contents
+    fi
+
+    fileStr=$(declare -p file)
+    fileStr=${fileStr/ file=/ ${2}=}
+
+    assign::value "$1" "$fileStr"
+}

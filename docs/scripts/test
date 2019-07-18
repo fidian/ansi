@@ -1,0 +1,211 @@
+#!/usr/bin/env bash
+
+setOptionalHeaders() {
+    # Set all optional fields
+    while [[ $# -gt 0 ]]; do
+        if [[ -z "${content[$1]-}" ]]; then
+            content[$1]=""
+        fi
+
+        shift
+    done
+}
+
+checkHeaders() {
+    local desiredHeaders file headers
+
+    desiredHeaders=$1
+
+    # Make sorted list of header names
+    headers="$(printf "%s\n" "${!content[@]}" | sort | tr '\n' ',')"
+    headers="${headers%%,}"
+
+    # Ensure headers exactly match
+    if [[ "$headers" != "$desiredHeaders" ]]; then
+        echo "Invalid set of headers: $headers"
+        echo "Expected: $desiredHeaders"
+
+        return 1
+    fi
+}
+
+testCategory() {
+    local content evalMe
+
+    if [[ "${1##*/}" =~ [^-a-z.0-9] ]]; then
+        echo "Invalid filename"
+        return 1
+    fi
+
+    if [[ "$1" != *.md ]]; then
+        echo "Invalid extension"
+        return 1
+    fi
+
+    if ! loadFile evalMe content "$1"; then
+        echo "Unable to load file"
+        return 1
+    fi
+
+    if ! eval "$evalMe"; then
+        echo "Failure to eval the returned file data"
+        return 1
+    fi
+
+    setOptionalHeaders "0"
+
+    if ! checkHeaders "0,Name"; then
+        return 1
+    fi
+}
+
+testCsi() {
+    local content evalMe
+
+    if [[ "${1##*/}" =~ [^-a-z.0-9] ]]; then
+        echo "Invalid filename"
+        return 1
+    fi
+
+    if [[ "$1" != *.md ]]; then
+        echo "Invalid extension"
+        return 1
+    fi
+
+
+    if ! loadFile evalMe content "$1"; then
+        echo "Unable to load file"
+        return 1
+    fi
+
+    if ! eval "$evalMe"; then
+        echo "Failure to eval the returned file data"
+        return 1
+    fi
+
+    setOptionalHeaders "0"
+
+    if ! checkHeaders "0,7-Bit Hex,8-Bit Hex,Category,Default,Description,Format,Source,Title"; then
+        return 1
+    fi
+
+    if [[ ${content[Category]} =~ [^-A-Z0-9] ]]; then
+        echo "Invalid characters in category: ${content[Category]}"
+        return 1
+    fi
+
+    if [[ ! -f "../categories/${content[Category],,}.md" ]]; then
+        echo "Category does not exist: ${content[Category]}"
+        return 1
+    fi
+
+    if [[ ${content[Source]} =~ [^-A-Z0-9] ]]; then
+        echo "Invalid characters in source: ${content[Source]}"
+        return 1
+    fi
+
+    if [[ ! -f "../sources/${content[Source],,}.md" ]]; then
+        echo "Source does not exist: ${content[Source]}"
+        return 1
+    fi
+
+    if [[ ! "${content[Format]}" =~ ^\`.*\`$ ]]; then
+        echo "Format is not markdown code: ${content[Format]}"
+        return 1
+    fi
+
+    if [[ ! "${content['8-Bit Hex']}" =~ ^\`[0-9a-z\ \{\}.]*\`$ ]]; then
+        echo "8-Bit Hex is not lowercase hex in markdown: ${content['8-Bit Hex']}"
+        return 1
+    fi
+
+    if [[ ! "${content['7-Bit Hex']}" =~ ^\`[0-9a-z\ \{\}.]*\`$ ]]; then
+        echo "7-Bit Hex is not lowercase hex in markdown: ${content['7-Bit Hex']}"
+        return 1
+    fi
+
+    if [[ ! "${content['Title']}" =~ ^\([A-Z]*\)(\ [A-Z][a-z]*)*$ ]]; then
+        echo "Poorly formatted title: ${content[Title]}"
+        return 1
+    fi
+}
+
+testSource() {
+    local content evalMe
+
+    if [[ "${1##*/}" =~ [^-a-z.0-9] ]]; then
+        errro "Invalid filename"
+        return 1
+    fi
+
+    if [[ "$1" != *.md ]]; then
+        echo "Invalid extension"
+        return 1
+    fi
+
+    if ! loadFile evalMe content "$1"; then
+        echo "Unable to load file" >&2
+        return 1
+    fi
+
+    if ! eval "$evalMe"; then
+        echo "Failure to eval the returned file data"
+        return 1
+    fi
+
+    if ! checkHeaders "Name,Short,Url"; then
+        return 1
+    fi
+
+    if [[ "${content[Short]}" =~ [^-A-Z0-9] ]]; then
+        echo "Invalid characters in short code: ${content[Short]}"
+        return 1
+    fi
+}
+
+cd "${0%/*}" || {
+    echo "Can't change directory."
+    exit 1
+}
+
+# shellcheck disable=SC1091
+. ./load-file
+
+checked=0
+failures=0
+
+for file in ../categories/*; do
+    if ! testCategory "$file"; then
+        echo "Problem with file: $file"
+        failures=$((failures + 1))
+    fi
+
+    checked=$((checked + 1))
+done
+
+for file in ../sources/*; do
+    if ! testSource "$file"; then
+        echo "Problem with file: $file"
+        failures=$((failures + 1))
+    fi
+
+    checked=$((checked + 1))
+done
+
+for file in ../csi/*; do
+    if ! testCsi "$file"; then
+        echo "Problem with file: $file"
+        failures=$((failures + 1))
+    fi
+
+    checked=$((checked + 1))
+done
+
+echo "$checked checked, $failures failures"
+
+if [[ "$failures" -eq 0 ]]; then
+    echo "All passed"
+else
+    echo "Failures found"
+    exit 1
+fi
