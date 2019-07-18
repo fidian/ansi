@@ -59,6 +59,34 @@ testCategory() {
     fi
 }
 
+testCode() {
+    local content evalMe
+
+    if [[ "${1##*/}" =~ [^-a-z.0-9] ]]; then
+        error "Invalid filename"
+        return 1
+    fi
+
+    if [[ "$1" != *.md ]]; then
+        error "Invalid extension"
+        return 1
+    fi
+
+    if ! loadFile evalMe content "$1"; then
+        error "Unable to load file"
+        return 1
+    fi
+
+    if ! eval "$evalMe"; then
+        error "Failure to eval the returned file data"
+        return 1
+    fi
+
+    if ! checkHeaders "7-Bit,8-Bit,Code,Description,Source"; then
+        return 1
+    fi
+}
+
 testCsi() {
     local content evalMe
 
@@ -181,6 +209,18 @@ for file in ../categories/*; do
     status "$file"
 
     if ! testCategory "$file"; then
+        error "Problem with file: $file"
+        failures=$((failures + 1))
+    fi
+
+    checked=$((checked + 1))
+    statusClear
+done
+
+for file in ../codes/*; do
+    status "$file"
+
+    if ! testCode "$file"; then
         error "Problem with file: $file"
         failures=$((failures + 1))
     fi

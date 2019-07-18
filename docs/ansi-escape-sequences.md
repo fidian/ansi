@@ -5,26 +5,25 @@ Terminals are sent characters and they do a great job of displaying them. One ca
 
 This is a collection of all of the ANSI escape sequences I can find. Please help me to improve and add to this list if you know of some that are missing. These lists are verified the best I can and sources are listed so you can find more information.
 
-**No terminal implements all codes!** The support of various sequences are dependent on the terminal supporting them. If you absolutely need something to work, you might need to switch terminals. Some of the sequences may not be implemented in any terminal. Many of these were made back in the days of dumb terminals and are no longer used.
+**No terminal implements all codes!** Well, at least no terminal I know about. The support of various sequences are dependent on the terminal supporting them. If you absolutely need something to work, you might need to switch terminals. Some of the sequences may not be implemented in any terminal. Many of these were made back in the days of dumb terminals and are no longer used.
 
 
 Terminology and Format Explanation
 ----------------------------------
 
-The codes will be listed using one of two format. This first format is describing the value of a single character.
+The codes will be listed using one of these formats.
 
-| Code              | Description                                              |
-|-------------------|----------------------------------------------------------|
-| **033, 27, 0x1b** | A literal character value. This is the Escape character. |
+| Format            | Description                                                                                    |
+|-------------------|------------------------------------------------------------------------------------------------|
+| **033, 27, 0x1b** | A literal character value. This is the escape character. Let's call it `ESC` for future codes. |
+| `[`               | A single character is another literal character value. This one is easier to show than escape. |
+| `ESC [`           | Here we use `ESC` from above and add the bracket character. This is the 7-bit `CSI` code.      |
+| `CSI {c} m`       | A template for how to change the color. `{c}` is a variable that will need to get replaced.    |
+| `CSI {n..} z`     | Allow a series of numbers as parameters.                                                       |
 
-The octal, decimal, and hexadecimal value of the character are all listed for convenience. The next format shows how to change the color.
+For some single characters, the octal, decimal, and hexadecimal value of the character are all listed for convenience. Other literal characters are just the character themselves, in the proper case, so `A` is different than `a`.
 
-| Code          | Description                              |
-|---------------|------------------------------------------|
-| `CSI {c} m`   | A sequence of characters.                |
-| `CSI {n..} z` | Allow a series of numbers as parameters. |
-
-The `CSI` translates into `ESC [` according to the table below, and `ESC` means the escape character (hex 0x27). `{c}` is a parameter to the operation, and `m` is the literal character "m". The second code has `{n..}` and it means a series of numbers, which is described later. If using the first format and the color code for blue (34), then this would be represented in your code as something like the following:
+The `CSI` translates into `ESC [`, and `ESC` means the escape character (hex 0x27). `{c}` is a parameter to the operation, and `m` is the literal character "m". The final code has `{n..}` and it means a series of numbers, which is described later. If using the first format and the color code for blue (34), then this would be represented in your code as something like the following:
 
     # bash
     printf "%s" $'\033[34m'
@@ -52,7 +51,7 @@ This table lists the necessary prefixes and character codes for the rest of the 
 | ST    | String Terminator                     | `ESC \`             | **0234, 156, 0x9c** | [E-CF] [E-CS] |
 | OSC   | Operating System Command              | `ESC ]`             | **0235, 157, 0x9d** | [E-CF] [E-CS] |
 
-Normally `GRAVE` would not need to be called out, but it's a special character in Markdown. Because this document uses Markdown, it can't easily be represented in the document. It's also known as a backwards apostrophe or a backtick.
+Normally `GRAVE` would not need to be called out, but it's a special character in Markdown. Because this document uses Markdown, it can't easily be represented. It's also known as a backwards apostrophe or a backtick.
 
 A practical reference of these codes can be found at [Wikipedia's C0 and C1 control codes](https://en.wikipedia.org/wiki/C0_and_C1_control_codes) and [ECMA's Control Functions For Coded Character Sets][E-CF]. The explanation of the allowed byte values is decrypted from [ECMA's 8-Bit Single-Byte Coded Graphic Character Set][E-CS].
 
