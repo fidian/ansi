@@ -1,5 +1,34 @@
 #!/usr/bin/env bash
 
+checkSourceHeader() {
+    local s sources
+
+    sources=$1
+
+    if [[ -z "$sources" ]]; then
+        error "Sources is empty."
+        return 1
+    fi
+
+    while [[ -n "$sources" ]]; do
+        s=${sources%% *}
+        sources=${sources:${#s}}
+        string::trim sources "$sources"
+
+        if [[ ! "$s" =~ ^\[[-A-Z0-9]*\]$ ]]; then
+            error "Invalid characters in source or bad format: $s"
+            return 1
+        fi
+
+        s=${s:1:-1}
+
+        if [[ ! -f "../sources/${s,,}.md" ]]; then
+            error "Source file does not exist: ${s}"
+            return 1
+        fi
+    done
+}
+
 setOptionalHeaders() {
     # Set all optional fields
     while [[ $# -gt 0 ]]; do
@@ -85,6 +114,10 @@ testCode() {
     if ! checkHeaders "7-Bit,8-Bit,Code,Description,Source"; then
         return 1
     fi
+
+    if ! checkSourceHeader "${content[Source]}"; then
+        return 1
+    fi
 }
 
 testCsi() {
@@ -127,13 +160,7 @@ testCsi() {
         return 1
     fi
 
-    if [[ ${content[Source]} =~ [^-A-Z0-9] ]]; then
-        error "Invalid characters in source: ${content[Source]}"
-        return 1
-    fi
-
-    if [[ ! -f "../sources/${content[Source],,}.md" ]]; then
-        error "Source does not exist: ${content[Source]}"
+    if ! checkSourceHeader "${content[Source]}"; then
         return 1
     fi
 
