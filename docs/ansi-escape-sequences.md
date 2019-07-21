@@ -1100,3 +1100,5 @@ readkey bpm library
 
 * Wikipedia's [ANSI Escape Code](https://en.wikipedia.org/wiki/ANSI_escape_code)
 https://github.com/doy/runes/blob/master/doc/all-escapes.txt
+VT420 codes
+Printer codes (epson, others?)
