@@ -16,6 +16,7 @@ The codes will be listed using one of these formats.
 | Format            | Description                                                                                    |
 |-------------------|------------------------------------------------------------------------------------------------|
 | **033, 27, 0x1b** | A literal character value. This is the escape character. Let's call it `ESC` for future codes. |
+| `ESC [` (`1b 5b`) | Textual representation of characters followed by their hex codes to make it unambiguous.       |
 | `[`               | A single character is another literal character value. This one is easier to show than escape. |
 | `ESC [`           | Here we use `ESC` from above and add the bracket character. This is the 7-bit `CSI` code.      |
 | `CSI {c} m`       | A template for how to change the color. `{c}` is a variable that will need to get replaced.    |

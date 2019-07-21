@@ -2,8 +2,8 @@
 #
 # ANSI code generator
 #
-# © Copyright 2015 Tyler Akins
-# Licensed under the MIT license with an additional non-advertising clause
+# © Copyright 2019 Tyler Akins
+# Licensed under the MIT license with an additional non-advertising clause.
 # See http://github.com/fidian/ansi
 
 ANSI_ESC=$'\033'
