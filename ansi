@@ -1626,8 +1626,126 @@ ansi() {
     fi
 }
 
-
 # Run if not sourced
-if [[ "$0" == "${BASH_SOURCE[0]}" ]]; then
+if [ "${BASH_SOURCE[0]}" != "$0" ]; then
+    export -f ansi \
+        ansi::backward \
+        ansi::bell \
+        ansi::black \
+        ansi::blackIntense \
+        ansi::blink \
+        ansi::blue \
+        ansi::blueIntense \
+        ansi::bgBlack \
+        ansi::bgBlackIntense \
+        ansi::bgBlue \
+        ansi::bgBlueIntense \
+        ansi::bgColor \
+        ansi::bgCyan \
+        ansi::bgCyanIntense \
+        ansi::bgGreen \
+        ansi::bgGreenIntense \
+        ansi::bgMagenta \
+        ansi::bgMagentaIntense \
+        ansi::bgRed \
+        ansi::bgRgb \
+        ansi::bgRedIntense \
+        ansi::bgWhite \
+        ansi::bgWhiteIntense \
+        ansi::bgYellow \
+        ansi::bgYellowIntense \
+        ansi::bold \
+        ansi::color \
+        ansi::colorCodes \
+        ansi::colorCodePatch \
+        ansi::colorTable \
+        ansi::colorTableLine \
+        ansi::column \
+        ansi::columnRelative \
+        ansi::cyan \
+        ansi::cyanIntense \
+        ansi::deleteChars \
+        ansi::deleteLines \
+        ansi::doubleUnderline \
+        ansi::down \
+        ansi::encircle \
+        ansi::eraseDisplay \
+        ansi::eraseChars \
+        ansi::eraseLine \
+        ansi::faint \
+        ansi::font \
+        ansi::forward \
+        ansi::fraktur \
+        ansi::frame \
+        ansi::green \
+        ansi::greenIntense \
+        ansi::hideCursor \
+        ansi::ideogramLeft \
+        ansi::ideogramLeftDouble \
+        ansi::ideogramRight \
+        ansi::ideogramRightDouble \
+        ansi::ideogramStress \
+        ansi::insertChars \
+        ansi::insertLines \
+        ansi::inverse \
+        ansi::invisible \
+        ansi::isAnsiSupported \
+        ansi::italic \
+        ansi::line \
+        ansi::lineRelative \
+        ansi::magenta \
+        ansi::magentaIntense \
+        ansi::nextLine \
+        ansi::noBlink \
+        ansi::noBorder \
+        ansi::noInverse \
+        ansi::normal \
+        ansi::noOverline \
+        ansi::noStrike \
+        ansi::noUnderline \
+        ansi::overline \
+        ansi::plain \
+        ansi::position \
+        ansi::previousLine \
+        ansi::rapidBlink \
+        ansi::red \
+        ansi::redIntense \
+        ansi::repeat \
+        ansi::report \
+        ansi::reportPosition \
+        ansi::reportIcon \
+        ansi::reportScreenChars \
+        ansi::reportTitle \
+        ansi::reportWindowChars \
+        ansi::reportWindowPixels \
+        ansi::reportWindowPosition \
+        ansi::reportWindowState \
+        ansi::reset \
+        ansi::resetAttributes \
+        ansi::resetBackground \
+        ansi::resetColor \
+        ansi::resetFont \
+        ansi::resetForeground \
+        ansi::resetIdeogram \
+        ansi::restoreCursor \
+        ansi::rgb \
+        ansi::saveCursor \
+        ansi::scrollDown \
+        ansi::scrollUp \
+        ansi::setIcon \
+        ansi::setTitle \
+        ansi::showCursor \
+        ansi::showHelp \
+        ansi::strike \
+        ansi::tabBackward \
+        ansi::tabForward \
+        ansi::underline \
+        ansi::up \
+        ansi::visible \
+        ansi::white \
+        ansi::whiteIntense \
+        ansi::yellow \
+        ansi::yellowIntense
+else
     ansi "$@" || exit $?
 fi
