@@ -864,7 +864,7 @@ ansi() {
         supported=false
     fi
 
-    while $readOptions; do
+    while $readOptions && [[ $# -gt 0 ]]; do
         case "$1" in
             --help | -h | -\?)
                 ansi::showHelp
