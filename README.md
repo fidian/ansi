@@ -89,9 +89,9 @@ It often helps when one can see how to use a new tool, so here's how this librar
 
     # Reset the terminal colors, reset to the default font, move the cursor
     # to row 1 column 1, and show the cursor if it was previously hidden.
-    # This is the same as the --reset option.
-    ansi --erase-display=2 --reset-all --position=1,1 --show-cursor \
-        --reset-font
+    # This long line is the same as the --reset option.
+    ansi --erase-display=2 --position=1,1 --show-cursor \
+        --reset-font --reset-color
 
     # Find out how many lines the terminal can display
     ansi --report-window-chars | cut -d , -f 1
