@@ -665,11 +665,11 @@ ansi::scrollUp() {
     printf '%s%sS' "$ANSI_CSI" "${1-}"
 }
 
-ansi::setIcon() {
+ansi::icon() {
     printf '%s1;%s%s' "$ANSI_OSC" "${1-}" "$ANSI_ST"
 }
 
-ansi::setTitle() {
+ansi::title() {
     printf '%s2;%s%s' "$ANSI_OSC" "${1-}" "$ANSI_ST"
 }
 
@@ -1552,19 +1552,19 @@ ansi() {
                 ;;
 
             --icon)
-                $supported && ansi::setIcon ""
+                $supported && ansi::icon ""
                 ;;
 
             --icon=*)
-                $supported && ansi::setIcon "${1#*=}"
+                $supported && ansi::icon "${1#*=}"
                 ;;
 
             --title)
-                $supported && ansi::setTitle ""
+                $supported && ansi::title ""
                 ;;
 
             --title=*)
-                $supported && ansi::setTitle "${1#*=}"
+                $supported && ansi::title "${1#*=}"
                 ;;
 
             --no-restore)
