@@ -1600,9 +1600,9 @@ ansi() {
     done
 
     printf '%s' "${1-}"
-    shift || :
 
-    if [[ "$#" -gt 0 ]]; then
+    if [[ "$#" -gt 1 ]]; then
+        shift || :
         printf "${IFS:0:1}%s" "${@}"
     fi
 
