@@ -540,11 +540,11 @@ ansi::repeat() {
 ansi::report() {
     local buff c report
 
-    # Write to stderr to bypass piping, which lets this work:
-    # ansi --report-window-chars | cut -d , -f 1
-    printf "%s%s" "$ANSI_CSI" "$1" >&2
     report=""
-    read -r -N "${#2}" -s -t 1 buff
+
+    # Note: read bypass piping, which lets this work:
+    # ansi --report-window-chars | cut -d , -f 1
+    read -p "$ANSI_CSI$1" -r -N "${#2}" -s -t 1 buff
 
     if [ "$buff" != "$2" ]; then
         return 1
