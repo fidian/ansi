@@ -1,0 +1,7 @@
+{
+    "description": "Add colors, control the cursor, manipulate the screen using ANSI escape codes.",
+    "install": "install -b ansi ${PREFIX:-/usr/local}/bin/ansi",
+    "name": "ansi",
+    "scripts": [ "./ansi"],
+    "version": "2.0.0"
+  }
